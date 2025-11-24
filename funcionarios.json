@@ -1,0 +1,26 @@
+{
+  "28469": {
+    "nome": "TIAGO ZONTA DA SILVA",
+    "funcao": "TÉCNICO DE SEGURANÇA DO TRABALHO",
+    "local": "SIBLO",
+    "setor": "PRENSAS",
+    "gestor": "VALDECI DUTRA",
+    "coordenador": "RUDIMAR DE LIMA"
+  },
+  "12345": {
+    "nome": "JOÃO DA SILVA",
+    "funcao": "OPERADOR DE MÁQUINAS",
+    "local": "SILON",
+    "setor": "MISTURAS",
+    "gestor": "WILLIAM BORGES DAROS",
+    "coordenador": "SAMARA RAMOS"
+  },
+  "67890": {
+    "nome": "MARIA SANTOS",
+    "funcao": "SUPERVISORA DE PRODUÇÃO",
+    "local": "SAPATAS",
+    "setor": "BENEFICIAMENTO",
+    "gestor": "MATEUS GIACOMINI DARIVA",
+    "coordenador": "GABRIEL FROIS"
+  }
+}
