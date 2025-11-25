@@ -1,10 +1,7 @@
-import jsPDF from 'jspdf';
 import * as htmlToImage from 'html-to-image';
-import { FormState } from '../types';
-import { validateForm, generateReportText } from './formHandlers';
 
 export const createExportHandlers = (
-  formData: FormState,
+  formData: any,
   selectedBodyParts: string[],
   images: File[],
   showNotification: (message: string, type: 'success' | 'error' | 'info') => void
@@ -76,46 +73,5 @@ export const createExportHandlers = (
     }
   };
 
-  const handleExportPDF = async () => {
-    const validationError = validateForm(formData, selectedBodyParts);
-    if (validationError) {
-      showNotification("Atenção! Há campos que necessitam ser preenchidos!", 'error');
-      return;
-    }
-
-    showNotification("Gerando PDF...", 'info');
-    const element = document.getElementById("export-area") as HTMLElement;
-    if (!element) {
-      showNotification("Área do relatório não encontrada.", "error");
-      return;
-    }
-    const canvas = await htmlToImage.toCanvas(element);
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF();
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 295; // A4 height in mm
-    const imgHeight = canvas.height * imgWidth / canvas.width;
-    let heightLeft = imgHeight;
-    let position = 0;
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-    const pdfBlob = pdf.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Relato de Ocorrência -.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showNotification("Relato exportado com sucesso!", 'success');
-  };
-
-  return { handleCopy, handleExportPDF };
+  return { handleCopy };
 };
