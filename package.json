@@ -12,6 +12,8 @@
     "copy-image-clipboard": "^2.1.2",
     "dexie": "^4.2.1",
     "file-saver": "^2.0.5",
+    "html-to-image": "^1.11.13",
+    "jspdf": "^3.0.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "xlsx": "^0.18.5"
