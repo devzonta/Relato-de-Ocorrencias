@@ -104,10 +104,12 @@ const App: React.FC = () => {
         className="bg-white shadow-lg border-2 border-black"
       >
         {/* Header */}
-        <header className="flex items-center justify-center gap-4 py-3 px-4 border-b-2 border-black"
+        <header className="relative flex items-center py-3 px-4 border-b-2 border-black"
                 style={{ backgroundColor: '#3F3F3F' }}>
-          <FrasleLogo />
-          <h1 className="text-lg md:text-xl font-bold text-white">
+          <div className="absolute left-4">
+            <FrasleLogo />
+          </div>
+          <h1 className="w-full text-lg md:text-xl font-bold text-white text-center">
             Relato De Ocorrência – Frasle Caxias
           </h1>
         </header>
