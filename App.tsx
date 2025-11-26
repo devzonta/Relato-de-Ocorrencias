@@ -6,7 +6,6 @@ import { FormState } from './types';
 import { FormRow, FormField } from './components/FormComponents';
 import { createResponsavelSSMAHandlers, createLocalHandlers, createSetorHandlers, createGestorHandlers, createCoordenadorHandlers } from './utils/autocompleteHandlers';
 import { createFormHandlers } from './utils/formHandlers';
-import { createExportHandlers } from './utils/exportHandlers';
 
 
 
@@ -60,6 +59,10 @@ const App: React.FC = () => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  // Labels dinâmicos para Gestor e Coordenador
+  const [gestorLabel, setGestorLabel] = useState('Gestor');
+  const [coordenadorLabel, setCoordenadorLabel] = useState('Coordenador');
 
   // Migrar dados do JSON para o banco na inicialização
   useEffect(() => {
@@ -118,9 +121,9 @@ const App: React.FC = () => {
     removeAcaoNecessaria,
     removeImage,
     showNotification,
-  } = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification);
+    handleCopy,
+  } = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setGestorLabel, setCoordenadorLabel);
 
-  const { handleCopy, handleExportPDF } = createExportHandlers(formData, selectedBodyParts, images, showNotification);
 
 
   return (
@@ -138,26 +141,13 @@ const App: React.FC = () => {
       {/* Floating Buttons */}
       <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
         <button
-          onClick={handleCopy}
+          onClick={() => handleCopy(formData, selectedBodyParts, images)}
           className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
           title="Copiar Relato"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
-        <button
-          onClick={handleExportPDF}
-          className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg"
-          title="Exportar PDF"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14,2 14,8 20,8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10,9 9,9 8,9"></polyline>
           </svg>
         </button>
       </div>
@@ -503,7 +493,7 @@ const App: React.FC = () => {
           <FormRow>
             <div className="flex-1 border-r border-gray-400 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">Gestor:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">{gestorLabel}:</label>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -536,7 +526,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex-1 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">Coordenador:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">{coordenadorLabel}:</label>
                 <div className="relative flex-1">
                   <input
                     type="text"

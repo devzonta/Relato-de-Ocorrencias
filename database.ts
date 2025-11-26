@@ -51,10 +51,10 @@ function parseTurno(turnoStr: string): { turno: string, escala: string } {
     const start = mainTurno.split('-')[0]?.padStart(4, '0') || '';
     const startHour = parseInt(start.slice(0, 2));
     const startMin = parseInt(start.slice(2));
-    if (startHour >= 6 && startHour < 15) turno = '1'; // Turno 1: 06:00 - 15:05
+    if (startHour === 7) turno = '4'; // Turno 4: 07:30 - 17:30
+    else if (startHour >= 6 && startHour < 15) turno = '1'; // Turno 1: 06:00 - 15:05
     else if (startHour >= 15 || (startHour >= 0 && startHour < 1)) turno = '2'; // Turno 2: 15:05 - 00:10
     else if (startHour >= 0 && startHour < 6) turno = '3'; // Turno 3: 00:10 - 06:00
-    else if (startHour === 7 && startMin >= 30) turno = '4'; // Turno 4: 07:30 - 17:30
   }
 
   const escala = isEscala ? 'Sim' : 'Não';

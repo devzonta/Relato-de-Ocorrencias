@@ -7,7 +7,9 @@ export const createFormHandlers = (
   setIsAutoFilled: React.Dispatch<React.SetStateAction<boolean>>,
   setImages: React.Dispatch<React.SetStateAction<File[]>>,
   setIsDragOver: React.Dispatch<React.SetStateAction<boolean>>,
-  setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' | 'info' } | null>>
+  setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' | 'info' } | null>>,
+  setGestorLabel?: React.Dispatch<React.SetStateAction<string>>,
+  setCoordenadorLabel?: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -98,6 +100,15 @@ export const createFormHandlers = (
             turno: funcionario.turno || '',
             escala: funcionario.escala || ''
           }));
+
+          // Se o cargo começar com "Coordenador", alterar os labels
+          if (funcionario.funcao && funcionario.funcao.toUpperCase().startsWith('COORDENADOR')) {
+            if (setGestorLabel) setGestorLabel('Gerente');
+            if (setCoordenadorLabel) setCoordenadorLabel('Diretor');
+          } else {
+            if (setGestorLabel) setGestorLabel('Gestor');
+            if (setCoordenadorLabel) setCoordenadorLabel('Coordenador');
+          }
           setIsAutoFilled(true);
           console.log('Campos preenchidos com:', funcionario);
         } else {
@@ -133,6 +144,8 @@ export const createFormHandlers = (
         turno: "",
         escala: ""
       }));
+      if (setGestorLabel) setGestorLabel('Gestor');
+      if (setCoordenadorLabel) setCoordenadorLabel('Coordenador');
     }
   };
 
@@ -185,6 +198,17 @@ export const createFormHandlers = (
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const handleCopy = async (formData: FormState, selectedBodyParts: string[], images: File[]) => {
+    try {
+      const reportText = generateReportText(formData, selectedBodyParts, images);
+      await navigator.clipboard.writeText(reportText);
+      showNotification('Relato copiado para a área de transferência!', 'success');
+    } catch (error) {
+      console.error('Erro ao copiar:', error);
+      showNotification('Erro ao copiar o relato', 'error');
+    }
+  };
+
   return {
     handleInputChange,
     handleCheckboxChange,
@@ -200,7 +224,8 @@ export const createFormHandlers = (
     removeAcaoImediata,
     removeAcaoNecessaria,
     removeImage,
-    showNotification
+    showNotification,
+    handleCopy
   };
 };
 

@@ -1,4 +1,4 @@
-import listas from '../listas.json';
+import listas from '../SSMA.json';
 import listaPessoas from '../pessoas.json';
 
 export const ssmaNames = listas.ssmaNames;
