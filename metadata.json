@@ -1,0 +1,5 @@
+{
+  "name": "Formulário de Relatório de Ocorrência",
+  "description": "Uma aplicação de formulário online para registrar relatórios de ocorrência, baseada em um modelo de documento existente, com uma interface limpa e responsiva.",
+  "requestFramePermissions": []
+}
