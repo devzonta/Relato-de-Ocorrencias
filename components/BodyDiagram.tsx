@@ -3,6 +3,120 @@ import React, { useState, useEffect } from "react";
 interface BodyDiagramProps {
   onSelectionChange?: (selected: string[]) => void;
 }
+interface BodyPartModalProps {
+  show: boolean;
+  title: string;
+  options: { label: string; description: string }[];
+  selectedOption: string;
+  onOptionChange: (value: string) => void;
+  onSelect: (option: { label: string; description: string }) => void;
+  onRemove: () => void;
+  onCancel: () => void;
+}
+
+const BodyPartModal: React.FC<BodyPartModalProps> = ({
+  show,
+  title,
+  options,
+  selectedOption,
+  onOptionChange,
+  onSelect,
+  onRemove,
+  onCancel,
+}) => {
+  if (!show) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "8px",
+          maxWidth: "400px",
+          width: "90%",
+        }}
+      >
+        <h3>{title}</h3>
+        <select
+          value={selectedOption}
+          onChange={(e) => onOptionChange(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            margin: "10px 0",
+            border: "1px solid #ccc",
+          }}
+        >
+          <option value="">Selecione uma opção</option>
+          {options.map((option) => (
+            <option key={option.label} value={option.label}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => {
+            const option = options.find((o) => o.label === selectedOption);
+            if (option) onSelect(option);
+          }}
+          style={{
+            display: "block",
+            width: "100%",
+            margin: "10px 0",
+            padding: "10px",
+            border: "1px solid #ccc",
+            backgroundColor: "#d4edda",
+            cursor: "pointer",
+          }}
+        >
+          Selecionar
+        </button>
+        <button
+          onClick={onRemove}
+          style={{
+            display: "block",
+            width: "100%",
+            margin: "10px 0",
+            padding: "10px",
+            border: "1px solid #ccc",
+            backgroundColor: "#fdd",
+            cursor: "pointer",
+          }}
+        >
+          Remover lesão nesta parte
+        </button>
+        <button
+          onClick={onCancel}
+          style={{
+            display: "block",
+            width: "100%",
+            margin: "5px 0",
+            padding: "10px",
+            border: "1px solid #ccc",
+            backgroundColor: "#eee",
+            cursor: "pointer",
+          }}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
   const [isFront, setIsFront] = useState(true);
@@ -15,59 +129,13 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
   const [abdomenPartId, setAbdomenPartId] = useState<string | null>(null);
   const [selectedAbdomenOption, setSelectedAbdomenOption] =
     useState<string>("");
-  const [showBackModal, setShowBackModal] = useState(false);
-  const [backPartId, setBackPartId] = useState<string | null>(null);
-  const [selectedBackOption, setSelectedBackOption] = useState<string>("");
-  const [showPelvisModal, setShowPelvisModal] = useState(false);
-  const [pelvisPartId, setPelvisPartId] = useState<string | null>(null);
-  const [selectedPelvisOption, setSelectedPelvisOption] = useState<string>("");
-  const [showRightShoulderModal, setShowRightShoulderModal] = useState(false);
-  const [rightShoulderPartId, setRightShoulderPartId] = useState<string | null>(
-    null
-  );
-  const [selectedRightShoulderOption, setSelectedRightShoulderOption] =
-    useState<string>("");
-  const [showLeftShoulderModal, setShowLeftShoulderModal] = useState(false);
-  const [leftShoulderPartId, setLeftShoulderPartId] = useState<string | null>(
-    null
-  );
-  const [selectedLeftShoulderOption, setSelectedLeftShoulderOption] =
-    useState<string>("");
-  const [showRightArmModal, setShowRightArmModal] = useState(false);
-  const [rightArmPartId, setRightArmPartId] = useState<string | null>(null);
-  const [selectedRightArmOption, setSelectedRightArmOption] =
-    useState<string>("");
-  const [showLeftArmModal, setShowLeftArmModal] = useState(false);
-  const [leftArmPartId, setLeftArmPartId] = useState<string | null>(null);
-  const [selectedLeftArmOption, setSelectedLeftArmOption] =
-    useState<string>("");
-  const [showRightElbowModal, setShowRightElbowModal] = useState(false);
-  const [rightElbowPartId, setRightElbowPartId] = useState<string | null>(null);
-  const [selectedRightElbowOption, setSelectedRightElbowOption] =
-    useState<string>("");
-  const [showLeftElbowModal, setShowLeftElbowModal] = useState(false);
-  const [leftElbowPartId, setLeftElbowPartId] = useState<string | null>(null);
-  const [selectedLeftElbowOption, setSelectedLeftElbowOption] =
-    useState<string>("");
-  const [showRightForearmModal, setShowRightForearmModal] = useState(false);
-  const [rightForearmPartId, setRightForearmPartId] = useState<string | null>(
-    null
-  );
-  const [selectedRightForearmOption, setSelectedRightForearmOption] =
-    useState<string>("");
-  const [showLeftForearmModal, setShowLeftForearmModal] = useState(false);
-  const [leftForearmPartId, setLeftForearmPartId] = useState<string | null>(
-    null
-  );
-  const [selectedLeftForearmOption, setSelectedLeftForearmOption] =
+  const [showLeftHandModal, setShowLeftHandModal] = useState(false);
+  const [leftHandPartId, setLeftHandPartId] = useState<string | null>(null);
+  const [selectedLeftHandOption, setSelectedLeftHandOption] =
     useState<string>("");
   const [showRightHandModal, setShowRightHandModal] = useState(false);
   const [rightHandPartId, setRightHandPartId] = useState<string | null>(null);
   const [selectedRightHandOption, setSelectedRightHandOption] =
-    useState<string>("");
-  const [showLeftHandModal, setShowLeftHandModal] = useState(false);
-  const [leftHandPartId, setLeftHandPartId] = useState<string | null>(null);
-  const [selectedLeftHandOption, setSelectedLeftHandOption] =
     useState<string>("");
   const [showRightFootModal, setShowRightFootModal] = useState(false);
   const [rightFootPartId, setRightFootPartId] = useState<string | null>(null);
@@ -80,24 +148,32 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
 
   const headOptions = [
     {
-      label: "Boca",
+      label: "BOCA",
       description: "inclusive lábios, dentes, língua, garganta e paladar",
     },
-    { label: "Cabeça", description: "partes múltiplas" },
-    { label: "Cabeça (Outras partes)", description: "" },
-    { label: "Crânio", description: "inclusive encéfalo" },
-    { label: "Face", description: "partes múltiplas" },
-    { label: "Mandíbula", description: "inclusive queixo" },
+    { label: "CABEÇA", description: "partes múltiplas" },
+    { label: "CABEÇA (OUTRAS PARTES)", description: "" },
+    { label: "CRÂNIO", description: "inclusive encéfalo" },
+    { label: "FACE", description: "partes múltiplas" },
+    { label: "MANDÍBULA", description: "inclusive queixo" },
     {
-      label: "Nariz",
+      label: "NARIZ",
       description: "inclusive fossas nasais, seios da face e olfato",
     },
-    { label: "Olho", description: "inclusive nervo ótico e visão" },
+    { label: "OLHO", description: "inclusive nervo ótico e visão" },
     {
-      label: "Ouvido",
+      label: "OUVIDO",
       description: "externo, médio, interno, audição e equilíbrio",
     },
   ].sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+
+  const headOptionsPosterior = [
+    { label: "CABEÇA (POSTERIOR)", description: "partes múltiplas" },
+    { label: "CABEÇA (OUTRAS PARTES)", description: "" },
+    { label: "CRÂNIO (POSTERIOR)", description: "inclusive encéfalo" },
+  ];
+
+  const [currentHeadOptions, setCurrentHeadOptions] = useState(headOptions);
 
   const neckOptions = [{ label: "Pescoço", description: "" }];
 
@@ -109,57 +185,15 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     { label: "Abdome", description: "inclusive órgãos internos" },
   ];
 
-  const backOptions = [
-    {
-      label: "Dorso",
-      description: "inclusive músculos dorsais, coluna e medula espinhal",
-    },
-  ];
 
-  const pelvisOptions = [
-    {
-      label: "Quadris",
-      description: "inclusive pélvis, órgãos pélvicos e nádegas",
-    },
-  ];
 
-  const rightShoulderOptions = [{ label: "OMBRO DIREITO", description: "" }];
-
-  const leftShoulderOptions = [{ label: "OMBRO ESQUERDO", description: "" }];
-
-  const rightArmOptions = [
-    {
-      label: "BRAÇO DIREITO",
-      description: "acima do cotovelo e entre o punho e o ombro",
-    },
-  ];
-
-  const leftArmOptions = [
-    {
-      label: "BRAÇO ESQUERDO",
-      description: "acima do cotovelo e entre o punho e o ombro",
-    },
-  ];
-
-  const rightElbowOptions = [{ label: "COTOVELO DIREITO", description: "" }];
-
-  const leftElbowOptions = [{ label: "COTOVELO ESQUERDO", description: "" }];
-
-  const rightForearmOptions = [
-    { label: "ANTEBRAÇO DIREITO", description: "entre o punho e o cotovelo" },
-  ];
-
-  const leftForearmOptions = [
-    { label: "ANTEBRAÇO ESQUERDO", description: "entre o punho e o cotovelo" },
+  const leftHandOptions = [
+    { label: "MÃO ESQUERDA", description: "exceto punho ou dedos" },
+    { label: "DEDO(MÃO)", description: "" },
   ];
 
   const rightHandOptions = [
     { label: "MÃO DIREITA", description: "exceto punho ou dedos" },
-    { label: "DEDO(MÃO)", description: "" },
-  ];
-
-  const leftHandOptions = [
-    { label: "MÃO ESQUERDA", description: "exceto punho ou dedos" },
     { label: "DEDO(MÃO)", description: "" },
   ];
 
@@ -184,7 +218,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     frt_2: "PESCOÇO",
     frt_3: "PEITO",
     frt_4: "ABDÔMEN",
-    frt_5: "PELVE",
+    frt_5: "QUADRIS",
     frt_6: "OMBRO DIREITO",
     frt_7: "OMBRO ESQUERDO",
     frt_8: "BRAÇO DIREITO",
@@ -212,7 +246,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     frt_30: "PEITO",
     frt_31: "MAMAS",
     frt_32: "ABDÔMEN",
-    frt_33: "PELVE",
+    frt_33: "QUADRIS",
     frt_34: "OMBRO DIREITO",
     frt_35: "OMBRO ESQUERDO",
     frt_36: "BRAÇO DIREITO",
@@ -235,95 +269,146 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     frt_53: "TORNOZELO ESQUERDO",
     frt_54: "SOLA DO PÉ DIREITO",
     frt_55: "SOLA DO PÉ ESQUERDO",
-    bck_1: "CABEÇA (TRASEIRA)",
-    bck_2: "PESCOÇO (TRASEIRO)",
+    bck_1: "CABEÇA (POSTERIOR)",
+    bck_2: "PESCOÇO (POSTERIOR)",
     bck_3: "COSTAS",
     bck_4: "LOMBAR",
-    bck_5: "NÁDEGAS",
-    bck_6: "OMBRO DIREITO (TRASEIRO)",
-    bck_7: "OMBRO ESQUERDO (TRASEIRO)",
-    bck_8: "BRAÇO DIREITO (TRASEIRO)",
-    bck_9: "BRAÇO ESQUERDO (TRASEIRO)",
-    bck_10: "COTOVELO DIREITO (TRASEIRO)",
-    bck_11: "COTOVELO ESQUERDO (TRASEIRO)",
-    bck_12: "ANTEBRAÇO DIREITO (TRASEIRO)",
-    bck_13: "ANTEBRAÇO ESQUERDO (TRASEIRO)",
-    bck_14: "PUNHO DIREITO (TRASEIRO)",
-    bck_15: "PUNHO ESQUERDO (TRASEIRO)",
-    bck_16: "MÃO DIREITA (TRASEIRA)",
-    bck_17: "MÃO ESQUERDA (TRASEIRA)",
+    bck_5: "QUADRIS (POSTERIOR)",
+    bck_6: "OMBRO DIREITO (POSTERIOR)",
+    bck_7: "OMBRO ESQUERDO (POSTERIOR)",
+    bck_8: "BRAÇO DIREITO (POSTERIOR)",
+    bck_9: "BRAÇO ESQUERDO (POSTERIOR)",
+    bck_10: "COTOVELO DIREITO (POSTERIOR)",
+    bck_11: "COTOVELO ESQUERDO (POSTERIOR)",
+    bck_12: "ANTEBRAÇO DIREITO (POSTERIOR)",
+    bck_13: "ANTEBRAÇO ESQUERDO (POSTERIOR)",
+    bck_14: "PUNHO DIREITO (POSTERIOR)",
+    bck_15: "PUNHO ESQUERDO (POSTERIOR)",
+    bck_16: "MÃO DIREITA (POSTERIOR)",
+    bck_17: "MÃO ESQUERDA (POSTERIOR)",
     bck_18: "COXA DIREITA (POSTERIOR)",
     bck_19: "COXA ESQUERDA (POSTERIOR)",
-    bck_20: "JOELHO DIREITO (TRASEIRO)",
-    bck_21: "JOELHO ESQUERDO (TRASEIRO)",
-    bck_22: "PANTURRILHA DIREITA",
-    bck_23: "PANTURRILHA ESQUERDA",
-    bck_24: "TORNOZELO DIREITO (TRASEIRO)",
-    bck_25: "TORNOZELO ESQUERDO (TRASEIRO)",
+    bck_20: "JOELHO DIREITO (POSTERIOR)",
+    bck_21: "JOELHO ESQUERDO (POSTERIOR)",
+    bck_22: "PERNA DIREITA (POSTERIOR)",
+    bck_23: "PERNA ESQUERDA (POSTERIOR)",
+    bck_24: "TORNOZELO DIREITO (POSTERIOR)",
+    bck_25: "TORNOZELO ESQUERDO (POSTERIOR)",
     bck_26: "SOLA DO PÉ DIREITO",
     bck_27: "SOLA DO PÉ ESQUERDO",
-    bck_28: "CABEÇA (TRASEIRA)",
-    bck_29: "PESCOÇO (TRASEIRO)",
+    bck_28: "CABEÇA (POSTERIOR)",
+    bck_29: "PESCOÇO (POSTERIOR)",
     bck_30: "COSTAS",
     bck_31: "LOMBAR",
-    bck_32: "NÁDEGAS",
-    bck_33: "OMBRO DIREITO (TRASEIRO)",
-    bck_34: "OMBRO ESQUERDO (TRASEIRO)",
-    bck_35: "BRAÇO DIREITO (TRASEIRO)",
-    bck_36: "BRAÇO ESQUERDO (TRASEIRO)",
-    bck_37: "COTOVELO DIREITO (TRASEIRO)",
-    bck_38: "COTOVELO ESQUERDO (TRASEIRO)",
-    bck_39: "ANTEBRAÇO DIREITO (TRASEIRO)",
-    bck_40: "ANTEBRAÇO ESQUERDO (TRASEIRO)",
-    bck_41: "PUNHO DIREITO (TRASEIRO)",
-    bck_42: "PUNHO ESQUERDO (TRASEIRO)",
-    bck_43: "MÃO DIREITA (TRASEIRA)",
-    bck_44: "MÃO ESQUERDA (TRASEIRA)",
+    bck_32: "QUADRIS (POSTERIOR)",
+    bck_33: "OMBRO DIREITO (POSTERIOR)",
+    bck_34: "OMBRO ESQUERDO (POSTERIOR)",
+    bck_35: "BRAÇO DIREITO (POSTERIOR)",
+    bck_36: "BRAÇO ESQUERDO (POSTERIOR)",
+    bck_37: "COTOVELO DIREITO (POSTERIOR)",
+    bck_38: "COTOVELO ESQUERDO (POSTERIOR)",
+    bck_39: "ANTEBRAÇO DIREITO (POSTERIOR)",
+    bck_40: "ANTEBRAÇO ESQUERDO (POSTERIOR)",
+    bck_41: "PUNHO DIREITO (POSTERIOR)",
+    bck_42: "PUNHO ESQUERDO (POSTERIOR)",
+    bck_43: "MÃO DIREITA (POSTERIOR)",
+    bck_44: "MÃO ESQUERDA (POSTERIOR)",
     bck_45: "COXA DIREITA (POSTERIOR)",
     bck_46: "COXA ESQUERDA (POSTERIOR)",
-    bck_47: "JOELHO DIREITO (TRASEIRO)",
-    bck_48: "JOELHO ESQUERDO (TRASEIRO)",
-    bck_49: "PANTURRILHA DIREITA",
-    bck_50: "PANTURRILHA ESQUERDA",
-    bck_51: "TORNOZELO DIREITO (TRASEIRO)",
-    bck_52: "TORNOZELO ESQUERDO (TRASEIRO)",
+    bck_47: "JOELHO DIREITO (POSTERIOR)",
+    bck_48: "JOELHO ESQUERDO (POSTERIOR)",
+    bck_49: "PERNA DIREITA (POSTERIOR)",
+    bck_50: "PERNA ESQUERDA (POSTERIOR)",
+    bck_51: "TORNOZELO DIREITO (POSTERIOR)",
+    bck_52: "TORNOZELO ESQUERDO (POSTERIOR)",
     bck_53: "SOLA DO PÉ DIREITO",
     bck_54: "SOLA DO PÉ ESQUERDO",
-    bck_55: "PÉ DIREITO (TRASEIRO)",
-    bck_56: "PÉ ESQUERDO (TRASEIRO)",
-    bck_57: "CABEÇA (TRASEIRA)",
-    bck_58: "PESCOÇO (TRASEIRO)",
+    bck_55: "PÉ DIREITO (POSTERIOR)",
+    bck_56: "PÉ ESQUERDO (POSTERIOR)",
+    bck_57: "CABEÇA (POSTERIOR)",
+    bck_58: "PESCOÇO (POSTERIOR)",
     bck_59: "COSTAS",
     bck_60: "LOMBAR",
     bck_61: "NÁDEGAS",
-    bck_62: "OMBRO DIREITO (TRASEIRO)",
-    bck_63: "OMBRO ESQUERDO (TRASEIRO)",
-    bck_64: "BRAÇO DIREITO (TRASEIRO)",
-    bck_65: "BRAÇO ESQUERDO (TRASEIRO)",
-    bck_66: "COTOVELO DIREITO (TRASEIRO)",
-    bck_67: "COTOVELO ESQUERDO (TRASEIRO)",
-    bck_68: "ANTEBRAÇO DIREITO (TRASEIRO)",
-    bck_69: "ANTEBRAÇO ESQUERDO (TRASEIRO)",
-    bck_70: "PUNHO DIREITO (TRASEIRO)",
-    bck_71: "PUNHO ESQUERDO (TRASEIRO)",
-    bck_72: "MÃO DIREITA (TRASEIRA)",
-    bck_73: "MÃO ESQUERDA (TRASEIRA)",
+    bck_62: "OMBRO DIREITO (POSTERIOR)",
+    bck_63: "OMBRO ESQUERDO (POSTERIOR)",
+    bck_64: "BRAÇO DIREITO (POSTERIOR)",
+    bck_65: "BRAÇO ESQUERDO (POSTERIOR)",
+    bck_66: "COTOVELO DIREITO (POSTERIOR)",
+    bck_67: "COTOVELO ESQUERDO (POSTERIOR)",
+    bck_68: "ANTEBRAÇO DIREITO (POSTERIOR)",
+    bck_69: "ANTEBRAÇO ESQUERDO (POSTERIOR)",
+    bck_70: "PUNHO DIREITO (POSTERIOR)",
+    bck_71: "PUNHO ESQUERDO (POSTERIOR)",
+    bck_72: "MÃO DIREITA (POSTERIOR)",
+    bck_73: "MÃO ESQUERDA (POSTERIOR)",
     bck_74: "COXA DIREITA (POSTERIOR)",
     bck_75: "COXA ESQUERDA (POSTERIOR)",
-    bck_76: "JOELHO DIREITO (TRASEIRO)",
-    bck_77: "JOELHO ESQUERDO (TRASEIRO)",
-    bck_78: "PANTURRILHA DIREITA",
-    bck_79: "PANTURRILHA ESQUERDA",
-    bck_80: "TORNOZELO DIREITO (TRASEIRO)",
-    bck_81: "TORNOZELO ESQUERDO (TRASEIRO)",
+    bck_76: "JOELHO DIREITO (POSTERIOR)",
+    bck_77: "JOELHO ESQUERDO (POSTERIOR)",
+    bck_78: "PERNA DIREITA (POSTERIOR)",
+    bck_79: "PERNA ESQUERDA (POSTERIOR)",
+    bck_80: "TORNOZELO DIREITO (POSTERIOR)",
+    bck_81: "TORNOZELO ESQUERDO (POSTERIOR)",
     bck_82: "SOLA DO PÉ DIREITO",
     bck_83: "SOLA DO PÉ ESQUERDO",
-    bck_84: "PÉ DIREITO (TRASEIRO)",
-    bck_85: "PÉ ESQUERDO (TRASEIRO)",
+    bck_84: "PÉ DIREITO (POSTERIOR)",
+    bck_85: "PÉ ESQUERDO (POSTERIOR)",
+  };
+
+  const getModalType = (partName: string): string | null => {
+    if (partName.includes('CABEÇA')) return 'head';
+    if (partName.includes('PESCOÇO')) return null;
+    if (partName.includes('PEITO') || partName.includes('TÓRAX') || partName.includes('MAMAS')) return null;
+    if (partName.includes('COSTAS') || partName.includes('LOMBAR') || partName.includes('DORSO')) return 'back';
+    if (partName.includes('ABDÔMEN')) return 'abdomen';
+    if (partName.includes('PELVE') || partName.includes('NÁDEGAS') || partName.includes('QUADRIS')) return 'pelvis';
+    if (partName.includes('MÃO DIREITA')) return 'rightHand';
+    if (partName.includes('MÃO ESQUERDA')) return 'leftHand';
+    if (partName.includes('PÉ DIREITO')) return 'rightFoot';
+    if (partName.includes('PÉ ESQUERDO')) return 'leftFoot';
+    if (partName.includes('COXA') || partName.includes('JOELHO') || partName.includes('PERNA') || partName.includes('TORNOZELO') || partName.includes('PERNA') || partName.includes('SOLA DO PÉ')) return null;
+    return null;
+  };
+
+  const getDirectLabel = (partName: string): string => {
+    if (partName.includes('PESCOÇO')) return 'PESCOÇO: ';
+    if (partName.includes('PEITO') || partName.includes('TÓRAX') || partName.includes('MAMAS')) return 'TÓRAX: inclusive órgãos internos';
+    if (partName.includes('OMBRO DIREITO')) return 'OMBRO DIREITO: ';
+    if (partName.includes('OMBRO ESQUERDO')) return 'OMBRO ESQUERDO: ';
+    if (partName.includes('BRAÇO DIREITO')) return 'BRAÇO DIREITO: acima do cotovelo e entre o punho e o ombro';
+    if (partName.includes('BRAÇO ESQUERDO')) return 'BRAÇO ESQUERDO: acima do cotovelo e entre o punho e o ombro';
+    if (partName.includes('COTOVELO DIREITO')) return 'COTOVELO DIREITO: ';
+    if (partName.includes('COTOVELO ESQUERDO')) return 'COTOVELO ESQUERDO: ';
+    if (partName.includes('ANTEBRAÇO DIREITO')) return 'ANTEBRAÇO DIREITO: entre o punho e o cotovelo';
+    if (partName.includes('ANTEBRAÇO ESQUERDO')) return 'ANTEBRAÇO ESQUERDO: entre o punho e o cotovelo';
+    if (partName.includes('COXA DIREITA')) return 'COXA DIREITA: ';
+    if (partName.includes('COXA ESQUERDA')) return 'COXA ESQUERDA: ';
+    if (partName.includes('JOELHO DIREITO')) return 'JOELHO DIREITO: ';
+    if (partName.includes('JOELHO ESQUERDO')) return 'JOELHO ESQUERDO: ';
+    if (partName.includes('PERNA DIREITA')) return 'PERNA DIREITA: entre o tornozelo e a pélvis';
+    if (partName.includes('PERNA ESQUERDA')) return 'PERNA ESQUERDA: entre o tornozelo e a pélvis';
+    if (partName.includes('TORNOZELO DIREITO')) return 'TORNOZELO DIREITO: ';
+    if (partName.includes('TORNOZELO ESQUERDO')) return 'TORNOZELO ESQUERDO: ';
+    if (partName.includes('PERNA DIREITA')) return 'PERNA DIREITA: entre o tornozelo e a pélvis';
+    if (partName.includes('PERNA ESQUERDA')) return 'PERNA ESQUERDA: entre o tornozelo e a pélvis';
+    if (partName.includes('COXA DIREITA (POSTERIOR)')) return 'COXA DIREITA: ';
+    if (partName.includes('COXA ESQUERDA (POSTERIOR)')) return 'COXA ESQUERDA: ';
+    if (partName.includes('JOELHO DIREITO (POSTERIOR)')) return 'JOELHO DIREITO: ';
+    if (partName.includes('JOELHO ESQUERDO (POSTERIOR)')) return 'JOELHO ESQUERDO: ';
+    if (partName.includes('PERNA DIREITA')) return 'PERNA DIREITA: entre o tornozelo e a pélvis';
+    if (partName.includes('PERNA ESQUERDA')) return 'PERNA ESQUERDA: entre o tornozelo e a pélvis';
+    if (partName.includes('TORNOZELO DIREITO (POSTERIOR)')) return 'TORNOZELO DIREITO: ';
+    if (partName.includes('TORNOZELO ESQUERDO (POSTERIOR)')) return 'TORNOZELO ESQUERDO: ';
+    if (partName.includes('SOLA DO PÉ DIREITO')) return 'SOLA DO PÉ DIREITO: ';
+    if (partName.includes('SOLA DO PÉ ESQUERDO')) return 'SOLA DO PÉ ESQUERDO: ';
+    if (partName.includes('PÉ DIREITO (POSTERIOR)')) return 'PÉ DIREITO (POSTERIOR): ';
+    if (partName.includes('PÉ ESQUERDO (POSTERIOR)')) return 'PÉ ESQUERDO (POSTERIOR): ';
+    return '';
   };
 
   const handlePartClick = (partId: string) => {
-    if (partId === "frt_1" || partId === "bck_1") {
+    if (partId === "frt_1" || partId === "bck_1" || partId === "frt_28" || partId === "bck_28" || partId === "bck_57") {
       setHeadPartId(partId);
       const partName = partNames[partId];
       const existing = selectedPartNames.find((name) =>
@@ -334,6 +419,11 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedHeadOption(parts[1]);
       } else {
         setSelectedHeadOption("");
+      }
+      if (partId.startsWith('bck')) {
+        setCurrentHeadOptions(headOptionsPosterior);
+      } else {
+        setCurrentHeadOptions(headOptions);
       }
       setShowHeadModal(true);
     } else if (
@@ -385,25 +475,30 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     } else if (
       partId === "bck_3" ||
       partId === "bck_4" ||
-      partId === "bck_30"
+      partId === "bck_30" ||
+      partId === "bck_31"
     ) {
-      setBackPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedBackOption(parts[1]);
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "Dorso";
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: ${label}: inclusive músculos dorsais, coluna e medula espinhal`)
+        );
       } else {
-        setSelectedBackOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "Dorso";
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: ${label}: inclusive músculos dorsais, coluna e medula espinhal`,
+        ]);
       }
-      setShowBackModal(true);
     } else if (
       partId === "frt_4" ||
-      partId === "frt_32" ||
-      partId === "bck_31" ||
-      partId === "bck_32"
+      partId === "frt_32"
     ) {
       setAbdomenPartId(partId);
       const partName = partNames[partId];
@@ -417,124 +512,160 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedAbdomenOption("");
       }
       setShowAbdomenModal(true);
-    } else if (partId === "frt_5" || partId === "bck_5") {
-      setPelvisPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedPelvisOption(parts[1]);
+    } else if (partId === "frt_5" || partId === "bck_5" || partId === "frt_33" || partId === "bck_32") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: inclusive pélvis, órgãos pélvicos e nádegas`)
+        );
       } else {
-        setSelectedPelvisOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: inclusive pélvis, órgãos pélvicos e nádegas`,
+        ]);
       }
-      setShowPelvisModal(true);
-    } else if (partId === "frt_6" || partId === "bck_6") {
-      setRightShoulderPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedRightShoulderOption(parts[1]);
+    } else if (partId === "frt_6" || partId === "bck_6" || partId === "frt_34" || partId === "bck_34") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: OMBRO DIREITO: `)
+        );
       } else {
-        setSelectedRightShoulderOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: OMBRO DIREITO: `,
+        ]);
       }
-      setShowRightShoulderModal(true);
-    } else if (partId === "frt_7" || partId === "bck_7") {
-      setLeftShoulderPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedLeftShoulderOption(parts[1]);
+    } else if (partId === "frt_7" || partId === "bck_7" || partId === "frt_35" || partId === "bck_35") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: OMBRO ESQUERDO: `)
+        );
       } else {
-        setSelectedLeftShoulderOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: OMBRO ESQUERDO: `,
+        ]);
       }
-      setShowLeftShoulderModal(true);
-    } else if (partId === "frt_8" || partId === "bck_8") {
-      setRightArmPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedRightArmOption(parts[1]);
+    } else if (partId === "frt_8" || partId === "bck_8" || partId === "frt_36" || partId === "bck_36") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: BRAÇO DIREITO: acima do cotovelo e entre o punho e o ombro`)
+        );
       } else {
-        setSelectedRightArmOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: BRAÇO DIREITO: acima do cotovelo e entre o punho e o ombro`,
+        ]);
       }
-      setShowRightArmModal(true);
-    } else if (partId === "frt_9" || partId === "bck_9") {
-      setLeftArmPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedLeftArmOption(parts[1]);
+    } else if (partId === "frt_9" || partId === "bck_9" || partId === "frt_37" || partId === "bck_37") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: BRAÇO ESQUERDO: acima do cotovelo e entre o punho e o ombro`)
+        );
       } else {
-        setSelectedLeftArmOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: BRAÇO ESQUERDO: acima do cotovelo e entre o punho e o ombro`,
+        ]);
       }
-      setShowLeftArmModal(true);
-    } else if (partId === "frt_10" || partId === "bck_10") {
-      setRightElbowPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedRightElbowOption(parts[1]);
+    } else if (partId === "frt_10" || partId === "bck_10" || partId === "frt_38" || partId === "bck_38") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: COTOVELO DIREITO: `)
+        );
       } else {
-        setSelectedRightElbowOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: COTOVELO DIREITO: `,
+        ]);
       }
-      setShowRightElbowModal(true);
-    } else if (partId === "frt_11" || partId === "bck_11") {
-      setLeftElbowPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedLeftElbowOption(parts[1]);
+    } else if (partId === "frt_11" || partId === "bck_11" || partId === "frt_39" || partId === "bck_39") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: COTOVELO ESQUERDO: `)
+        );
       } else {
-        setSelectedLeftElbowOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: COTOVELO ESQUERDO: `,
+        ]);
       }
-      setShowLeftElbowModal(true);
-    } else if (partId === "frt_12" || partId === "bck_12") {
-      setRightForearmPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedRightForearmOption(parts[1]);
+    } else if (partId === "frt_12" || partId === "bck_12" || partId === "frt_40" || partId === "bck_40") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: ANTEBRAÇO DIREITO: entre o punho e o cotovelo`)
+        );
       } else {
-        setSelectedRightForearmOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: ANTEBRAÇO DIREITO: entre o punho e o cotovelo`,
+        ]);
       }
-      setShowRightForearmModal(true);
-    } else if (partId === "frt_13" || partId === "bck_13") {
-      setLeftForearmPartId(partId);
-      const partName = partNames[partId];
-      const existing = selectedPartNames.find((name) =>
-        name.startsWith(`${partName}: `)
-      );
-      if (existing) {
-        const parts = existing.split(": ");
-        setSelectedLeftForearmOption(parts[1]);
+    } else if (partId === "frt_13" || partId === "bck_13" || partId === "frt_41" || partId === "bck_41") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: ANTEBRAÇO ESQUERDO: entre o punho e o cotovelo`)
+        );
       } else {
-        setSelectedLeftForearmOption("");
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: ANTEBRAÇO ESQUERDO: entre o punho e o cotovelo`,
+        ]);
       }
-      setShowLeftForearmModal(true);
-    } else if (partId === "frt_16" || partId === "bck_16") {
+    } else if (partId === "frt_16" || partId === "bck_16" || partId === "frt_44" || partId === "bck_43") {
       setRightHandPartId(partId);
       const partName = partNames[partId];
       const existing = selectedPartNames.find((name) =>
@@ -547,7 +678,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedRightHandOption("");
       }
       setShowRightHandModal(true);
-    } else if (partId === "frt_17" || partId === "bck_17") {
+    } else if (partId === "frt_17" || partId === "bck_17" || partId === "frt_45" || partId === "bck_44") {
       setLeftHandPartId(partId);
       const partName = partNames[partId];
       const existing = selectedPartNames.find((name) =>
@@ -560,7 +691,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedLeftHandOption("");
       }
       setShowLeftHandModal(true);
-    } else if (partId === "frt_26" || partId === "bck_26") {
+    } else if (partId === "frt_26" || partId === "bck_26" || partId === "frt_54" || partId === "bck_55") {
       setRightFootPartId(partId);
       const partName = partNames[partId];
       const existing = selectedPartNames.find((name) =>
@@ -573,7 +704,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedRightFootOption("");
       }
       setShowRightFootModal(true);
-    } else if (partId === "frt_27" || partId === "bck_27") {
+    } else if (partId === "frt_27" || partId === "bck_27" || partId === "frt_55" || partId === "bck_56") {
       setLeftFootPartId(partId);
       const partName = partNames[partId];
       const existing = selectedPartNames.find((name) =>
@@ -586,7 +717,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedLeftFootOption("");
       }
       setShowLeftFootModal(true);
-    } else if (partId === "frt_22" || partId === "bck_22") {
+    } else if (partId === "frt_22") {
       if (selectedParts.has(partId)) {
         setSelectedParts((prev) => {
           const newSet = new Set(prev);
@@ -597,17 +728,17 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           prev.filter(
             (name) =>
               name !==
-              `${partNames[partId]}: PERNA DIREITA: entre o tornozelo e a pélvis`
+              `${partNames[partId]}: entre o tornozelo e a pélvis`
           )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: PERNA DIREITA: entre o tornozelo e a pélvis`,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
-    } else if (partId === "frt_23" || partId === "bck_23") {
+    } else if (partId === "frt_23") {
       if (selectedParts.has(partId)) {
         setSelectedParts((prev) => {
           const newSet = new Set(prev);
@@ -618,17 +749,17 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           prev.filter(
             (name) =>
               name !==
-              `${partNames[partId]}: PERNA ESQUERDA: entre o tornozelo e a pÃ©lvis`
+              `${partNames[partId]}: entre o tornozelo e a pélvis`
           )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: PERNA ESQUERDA: entre o tornozelo e a pÃ©lvis`,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
-    } else if ((partId as string) === "bck_57") {
+    } else if (partId === "frt_50") {
       if (selectedParts.has(partId)) {
         setSelectedParts((prev) => {
           const newSet = new Set(prev);
@@ -636,13 +767,72 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           return newSet;
         });
         setSelectedPartNames((prev) =>
-          prev.filter((name) => name !== `${partNames[partId]}: CABEÇA: `)
+          prev.filter(
+            (name) =>
+              name !==
+              `${partNames[partId]}: entre o tornozelo e a pélvis`
+          )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: CABEÇA: `,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
+        ]);
+      }
+    } else if (partId === "frt_51") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter(
+            (name) =>
+              name !==
+              `${partNames[partId]}: entre o tornozelo e a pélvis`
+          )
+        );
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
+        ]);
+      }
+    } else if (partId === "bck_49") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`)
+        );
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
+        ]);
+      }
+    } else if (partId === "bck_50") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`)
+        );
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
     } else if ((partId as string) === "bck_58") {
@@ -1048,14 +1238,14 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         });
         setSelectedPartNames((prev) =>
           prev.filter(
-            (name) => name !== `${partNames[partId]}: PANTURRILHA DIREITA: `
+            (name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`
           )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: PANTURRILHA DIREITA: `,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
     } else if ((partId as string) === "bck_79") {
@@ -1067,14 +1257,14 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         });
         setSelectedPartNames((prev) =>
           prev.filter(
-            (name) => name !== `${partNames[partId]}: PANTURRILHA ESQUERDA: `
+            (name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`
           )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: PANTURRILHA ESQUERDA: `,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
     } else if ((partId as string) === "bck_80") {
@@ -1115,44 +1305,6 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           `${partNames[partId]}: TORNOZELO ESQUERDO: `,
         ]);
       }
-    } else if ((partId as string) === "bck_82") {
-      if (selectedParts.has(partId)) {
-        setSelectedParts((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(partId);
-          return newSet;
-        });
-        setSelectedPartNames((prev) =>
-          prev.filter(
-            (name) => name !== `${partNames[partId]}: SOLA DO PÉ DIREITO: `
-          )
-        );
-      } else {
-        setSelectedParts((prev) => new Set(prev).add(partId));
-        setSelectedPartNames((prev) => [
-          ...prev,
-          `${partNames[partId]}: SOLA DO PÉ DIREITO: `,
-        ]);
-      }
-    } else if ((partId as string) === "bck_83") {
-      if (selectedParts.has(partId)) {
-        setSelectedParts((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(partId);
-          return newSet;
-        });
-        setSelectedPartNames((prev) =>
-          prev.filter(
-            (name) => name !== `${partNames[partId]}: SOLA DO PÉ ESQUERDO: `
-          )
-        );
-      } else {
-        setSelectedParts((prev) => new Set(prev).add(partId));
-        setSelectedPartNames((prev) => [
-          ...prev,
-          `${partNames[partId]}: SOLA DO PÉ ESQUERDO: `,
-        ]);
-      }
     } else if ((partId as string) === "bck_84") {
       if (selectedParts.has(partId)) {
         setSelectedParts((prev) => {
@@ -1181,34 +1333,70 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           return newSet;
         });
         setSelectedPartNames((prev) =>
+          prev.filter((name) => name !== `${partNames[partId]}: PÉ ESQUERDO: exceto artelhos`)
+        );
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          partNames[partId] + ': PÉ ESQUERDO: exceto artelhos',
+        ]);
+      }
+    } else if (partId === "bck_22") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
           prev.filter(
-            (name) =>
-              name !== `${partNames[partId]}: PÉ ESQUERDO: exceto artelhos`
+            (name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`
           )
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
         setSelectedPartNames((prev) => [
           ...prev,
-          `${partNames[partId]}: PÉ ESQUERDO: exceto artelhos`,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
+        ]);
+      }
+    } else if (partId === "bck_23") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) =>
+          prev.filter(
+            (name) => name !== `${partNames[partId]}: entre o tornozelo e a pélvis`
+          )
+        );
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [
+          ...prev,
+          `${partNames[partId]}: entre o tornozelo e a pélvis`,
         ]);
       }
     } else {
+      const isSelected = selectedParts.has(partId);
       setSelectedParts((prev) => {
         const newSet = new Set(prev);
-        if (newSet.has(partId)) {
+        if (isSelected) {
           newSet.delete(partId);
-          setSelectedPartNames((prevNames) =>
-            prevNames.filter((name) => name !== partNames[partId])
-          );
         } else {
           newSet.add(partId);
-          setSelectedPartNames((prevNames) => [
-            ...prevNames,
-            partNames[partId],
-          ]);
         }
         return newSet;
+      });
+      setSelectedPartNames((prevNames) => {
+        if (isSelected) {
+          return prevNames.filter((name) => name !== partNames[partId]);
+        } else {
+          return [...prevNames, partNames[partId]];
+        }
       });
     }
   };
@@ -1272,324 +1460,11 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     setAbdomenPartId(null);
   };
 
-  const handleBackSelect = (option: { label: string; description: string }) => {
-    const partName = partNames[backPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(backPartId!));
-    setShowBackModal(false);
-    setBackPartId(null);
-  };
 
-  const handleRemoveBack = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(backPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partNames[backPartId!]}: `))
-    );
-    setShowBackModal(false);
-    setBackPartId(null);
-  };
 
-  const handlePelvisSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[pelvisPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(pelvisPartId!));
-    setShowPelvisModal(false);
-    setPelvisPartId(null);
-  };
 
-  const handleRemovePelvis = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(pelvisPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partNames[pelvisPartId!]}: `))
-    );
-    setShowPelvisModal(false);
-    setPelvisPartId(null);
-  };
 
-  const handleRightShoulderSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[rightShoulderPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(rightShoulderPartId!));
-    setShowRightShoulderModal(false);
-    setRightShoulderPartId(null);
-  };
 
-  const handleRemoveRightShoulder = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(rightShoulderPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[rightShoulderPartId!]}: `)
-      )
-    );
-    setShowRightShoulderModal(false);
-    setRightShoulderPartId(null);
-  };
-
-  const handleLeftShoulderSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[leftShoulderPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(leftShoulderPartId!));
-    setShowLeftShoulderModal(false);
-    setLeftShoulderPartId(null);
-  };
-
-  const handleRemoveLeftShoulder = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(leftShoulderPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[leftShoulderPartId!]}: `)
-      )
-    );
-    setShowLeftShoulderModal(false);
-    setLeftShoulderPartId(null);
-  };
-
-  const handleRightArmSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[rightArmPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(rightArmPartId!));
-    setShowRightArmModal(false);
-    setRightArmPartId(null);
-  };
-
-  const handleRemoveRightArm = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(rightArmPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partNames[rightArmPartId!]}: `))
-    );
-    setShowRightArmModal(false);
-    setRightArmPartId(null);
-  };
-
-  const handleLeftArmSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[leftArmPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(leftArmPartId!));
-    setShowLeftArmModal(false);
-    setLeftArmPartId(null);
-  };
-
-  const handleRemoveLeftArm = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(leftArmPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partNames[leftArmPartId!]}: `))
-    );
-    setShowLeftArmModal(false);
-    setLeftArmPartId(null);
-  };
-
-  const handleRightElbowSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[rightElbowPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(rightElbowPartId!));
-    setShowRightElbowModal(false);
-    setRightElbowPartId(null);
-  };
-
-  const handleRemoveRightElbow = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(rightElbowPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[rightElbowPartId!]}: `)
-      )
-    );
-    setShowRightElbowModal(false);
-    setRightElbowPartId(null);
-  };
-
-  const handleLeftElbowSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[leftElbowPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(leftElbowPartId!));
-    setShowLeftElbowModal(false);
-    setLeftElbowPartId(null);
-  };
-
-  const handleRemoveLeftElbow = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(leftElbowPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[leftElbowPartId!]}: `)
-      )
-    );
-    setShowLeftElbowModal(false);
-    setLeftElbowPartId(null);
-  };
-
-  const handleRightForearmSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[rightForearmPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(rightForearmPartId!));
-    setShowRightForearmModal(false);
-    setRightForearmPartId(null);
-  };
-
-  const handleRemoveRightForearm = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(rightForearmPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[rightForearmPartId!]}: `)
-      )
-    );
-    setShowRightForearmModal(false);
-    setRightForearmPartId(null);
-  };
-
-  const handleLeftForearmSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[leftForearmPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(leftForearmPartId!));
-    setShowLeftForearmModal(false);
-    setLeftForearmPartId(null);
-  };
-
-  const handleRemoveLeftForearm = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(leftForearmPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[leftForearmPartId!]}: `)
-      )
-    );
-    setShowLeftForearmModal(false);
-    setLeftForearmPartId(null);
-  };
-
-  const handleRightHandSelect = (option: {
-    label: string;
-    description: string;
-  }) => {
-    const partName = partNames[rightHandPartId!];
-    const fullName = `${partName}: ${option.label}: ${option.description}`;
-    setSelectedPartNames((prev) =>
-      prev.filter((name) => !name.startsWith(`${partName}: `))
-    );
-    setSelectedPartNames((prev) => [...prev, fullName]);
-    setSelectedParts((prev) => new Set(prev).add(rightHandPartId!));
-    setShowRightHandModal(false);
-    setRightHandPartId(null);
-  };
-
-  const handleRemoveRightHand = () => {
-    setSelectedParts((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(rightHandPartId!);
-      return newSet;
-    });
-    setSelectedPartNames((prev) =>
-      prev.filter(
-        (name) => !name.startsWith(`${partNames[rightHandPartId!]}: `)
-      )
-    );
-    setShowRightHandModal(false);
-    setRightHandPartId(null);
-  };
 
   const handleLeftHandSelect = (option: {
     label: string;
@@ -1617,6 +1492,34 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     );
     setShowLeftHandModal(false);
     setLeftHandPartId(null);
+  };
+
+  const handleRightHandSelect = (option: {
+    label: string;
+    description: string;
+  }) => {
+    const partName = partNames[rightHandPartId!];
+    const fullName = `${partName}: ${option.label}: ${option.description}`;
+    setSelectedPartNames((prev) =>
+      prev.filter((name) => !name.startsWith(`${partName}: `))
+    );
+    setSelectedPartNames((prev) => [...prev, fullName]);
+    setSelectedParts((prev) => new Set(prev).add(rightHandPartId!));
+    setShowRightHandModal(false);
+    setRightHandPartId(null);
+  };
+
+  const handleRemoveRightHand = () => {
+    setSelectedParts((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(rightHandPartId!);
+      return newSet;
+    });
+    setSelectedPartNames((prev) =>
+      prev.filter((name) => !name.startsWith(`${partNames[rightHandPartId!]}: `))
+    );
+    setShowRightHandModal(false);
+    setRightHandPartId(null);
   };
 
   const handleRightFootSelect = (option: {
@@ -1706,47 +1609,38 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
             fontSize: "14px",
           }}
         >
-          {selectedPartNames.length > 0
-            ? selectedPartNames.map((name, index) => {
+          {selectedPartNames.length > 1
+            ? "PARTES MULTIPLAS"
+            : selectedPartNames.length === 1
+            ? (() => {
+                const parts = selectedPartNames[0].split(": ");
+                if (parts.length === 3) {
+                  return parts[1];
+                } else {
+                  return parts[0];
+                }
+              })()
+            : "SEM LESÃO"}
+          {selectedPartNames.length > 1 && (
+            <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+              {selectedPartNames.map((name, index) => {
                 const parts = name.split(": ");
                 if (parts.length === 3) {
-                  // cabeça: subparte: descrição
                   return (
                     <div key={index}>
                       {parts[1]}
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#666",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {parts[2]}
-                      </div>
                     </div>
                   );
                 } else {
-                  // normal
-                  const [part, subpart] = parts;
                   return (
                     <div key={index}>
-                      {part}
-                      {subpart && (
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#666",
-                            marginTop: "2px",
-                          }}
-                        >
-                          {subpart}
-                        </div>
-                      )}
+                      {parts[0]}
                     </div>
                   );
                 }
-              })
-            : "SEM LESÃO"}
+              })}
+            </div>
+          )}
         </div>
         <div id="organswrapper" className="col-md-8 m-top-20">
           {isFront ? (
@@ -1885,13 +1779,13 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
                 d="M395,916.834c2,8.333,4.333,14.167,4.333,24s4,22.167,5.167,25c17.417,18.167,61,46.833,69.25-8.834c0-11.5,3.25-39.334,3.584-50.334c0.334-11,1.333-13,7-23C447.478,896.81,431.334,942.667,395,916.834z"
               />
               <path
-                id="PERNA_D_M"
+                id="PANTURRILHA_D_M"
                 onClick={() => handlePartClick("frt_22")}
                 style={getPartStyle("frt_22")}
                 d="M252.348,963.921c0.085,4.202,0.072,8.622-0.239,13.122c-1.393,20.15-4.799,41.913-4.109,52.957c1,16,4.5,62,7.5,83s6.875,83,7.125,87.5c0.06,1.082,0.008,2.26-0.107,3.478c6.992-11.484,36.463-9.869,44.754-6.101c-1.079-3.858-2.297-10.522-2.439-15.043c-0.167-5.333,7.5-47.167,8.333-58.333c0.833-11.166,3.667-29.5,4.333-33.333s5.75-17.168,9.5-25.918s3.5-20,2.5-27.25s-3.75-45.75-4.5-51.375s-2.25-13.125-3.5-15.125c-0.615-0.984-0.563-2.333-0.248-3.642C303.372,985.144,262.939,1008.37,252.348,963.921z"
               />
               <path
-                id="PERNA_E_M"
+                id="PANTURRILHA_E_M"
                 onClick={() => handlePartClick("frt_23")}
                 style={getPartStyle("frt_23")}
                 d="M404.5,965.834c1.167,2.833-1.25,16.416-4.25,33.916s-4.083,48.751-3.083,56.751s9.667,28.833,11.833,35s0.667,8.833,2,20.833s7.167,47.334,9,59s1.5,21-0.667,27.167C426,1194,462,1191.5,465.5,1207c-0.75-4.25-1.75-10-1-22.25s5-60.25,8.25-87.75s6.75-82,4.5-96.5s-3.5-32-3.5-43.5C465.5,1012.667,421.917,984.001,404.5,965.834z"
@@ -2225,7 +2119,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
                 d="M293.013,955.709c-16.216-0.99-34.024-5.496-48.263-28.709c2.5,13,3.25,32.25,4.25,53.5c0.655,13.917-0.085,29.658-1.164,42.445c2.574-20.91,19.107-19.136,35.64-17.488c16.633,1.658,33.267,3.273,35.69,9.876c-1.167-5.5,0.667-11.167,3-16c2.333-4.833,3.167-17.833,4-28.833s5.833-24.334,7.5-30.167C326.455,952.76,310.679,956.788,293.013,955.709z"
               />
               <path
-                id="PANTURRILHA_D_M"
+                id="PANTURRILHAD_M"
                 onClick={() => handlePartClick("bck_22")}
                 style={getPartStyle("bck_22")}
                 d="M444.023,1005.457c-14.171,1.413-30.511,3.522-36.539,8.198c-0.064,1.573-0.221,3.253-0.484,5.095c-1.25,8.75-7,65.25-7.5,84.75s7.5,36,10.5,40s3.75,15.5,4,21.75c0.127,3.173,1.801,16.722,3.81,30.928c5.639,7.736,15.869,11.903,25.567,11.521c11.76-0.464,25.932-3.604,30.46-12.624c0.124-3.28,0.257-6.378,0.413-9.074c0.75-13,4.75-46.75,7.5-74s3-44.75,1-62.25c-0.92-8.055-2-18.392-2.872-30.246C473.377,1006.754,457.682,1004.096,444.023,1005.457z"
@@ -2274,176 +2168,176 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
               />
               <path
                 id="CABECA_TRAS_F"
-                onClick={() => handlePartClick("bck_30")}
-                style={getPartStyle("bck_30")}
+                onClick={() => handlePartClick("bck_28")}
+                style={getPartStyle("bck_28")}
                 d="M1126.355,199.415c0.778-1.884,1.421-3.543,1.734-4.601c8.91-30.064,10.593-68.02,7.453-84.763c-7.043-37.551-26.043-49.365-55.076-49.365c-24.545,0-45.633,15.813-51.082,50.793c-0.606,3.894-0.719,18.188-0.385,24.688s5.166,38.333,6.5,51.166c0.402,3.875,1.295,7.531,2.367,10.834C1052.742,213.064,1109.674,213.289,1126.355,199.415z"
               />
               <path
                 id="PESCOCO_TRAS_F"
-                onClick={() => handlePartClick("bck_31")}
-                style={getPartStyle("bck_31")}
+                onClick={() => handlePartClick("bck_29")}
+                style={getPartStyle("bck_29")}
                 d="M1159.289,256.58c-24.708-4.058-43.898-6.108-38.521-44.124c0.075-0.529,3.383-7.698,5.588-13.041c-16.682,13.874-73.613,13.649-88.488-1.248c2.479,7.635,5.935,13.355,6.633,15.333c1,2.833,1.101,23.757-0.833,27.333c-4.764,8.81-20.45,14.072-36.136,16.957C1032.887,261.835,1137.844,261.565,1159.289,256.58z"
               />
               <path
                 id="COSTAS_F"
-                onClick={() => handlePartClick("bck_32")}
-                style={getPartStyle("bck_32")}
+                onClick={() => handlePartClick("bck_30")}
+                style={getPartStyle("bck_30")}
                 d="M1187.059,352.366c1.042-6.596,4.563-15.113,6.822-24.408c1.684-6.926,2.669-14.283,1.402-21.604c-1.211-6.999-8.583-33.088-27.918-48.359c-2.739-0.525-5.439-0.982-8.076-1.415c-21.445,4.984-126.402,5.255-151.758,1.211c-2.954,0.544-5.905,1.001-8.786,1.383c-20.906,14.732-28.538,41.156-28.639,52.963c-0.052,6.076,0.717,11.467,1.741,16.199c1.65,7.623,3.969,13.524,4.623,17.745c0.935,6.021,4.099,12.505,3.347,30.31c0.695-0.762,1.361-0.074,1.599,1.775c0.334,2.583,0.414,8.647,0.584,14.167c0.834,27.167,8.25,62.417,10.5,74.417c0.864,4.607,2.134,12.61,3.412,21.707c12.51,3.593,36.984,6.452,64.054,7.054c8.353,0.186,16.95-1.671,25.52-1.713c8.629-0.043,17.228,1.729,25.513,1.458c24.939-0.817,47.03-3.692,58.604-7.104c0.909-7.375,1.759-13.759,2.148-15.152c1.348-4.822,7.622-41.454,8.5-45.25c2.354-10.18,2.502-27.106,3.25-30c0.749-2.893,0.702-21.669,1.75-21.75c0.085-0.006,0.299,0.349,0.618,0.999C1185.572,369.207,1185.675,361.114,1187.059,352.366z"
               />
               <path
                 id="LOMBAR_F"
-                onClick={() => handlePartClick("bck_33")}
-                style={getPartStyle("bck_33")}
+                onClick={() => handlePartClick("bck_31")}
+                style={getPartStyle("bck_31")}
                 d="M1085.485,493.798c-8.569,0.042-17.167,1.899-25.52,1.713c-27.069-0.602-51.544-3.461-64.054-7.054c2.051,14.595,4.126,32.012,4.588,42.793c0.75,17.5-3,26-8.75,39.25c-2.334,5.377-6.521,15.532-11.106,27.505c12.579-6.673,39.644-11.567,58.938-11.567c26.518,0,27.865,9.913,46.273,9.913c17.061,0,23.347-9.685,46.269-9.805c19.26-0.1,44.073,7.602,54.368,15.691c-3.005-8.806-5.877-17.667-8.825-23.904c-4.333-9.167-11.751-27.5-12.667-31.583c-1.039-4.633,0.9-27.839,1.5-32.5c0.354-2.753,1.789-15.457,3.102-26.098c-11.573,3.412-33.664,6.287-58.604,7.104C1102.713,495.527,1094.114,493.755,1085.485,493.798z"
               />
               <path
                 id="NADEGAS_F"
-                onClick={() => handlePartClick("bck_34")}
-                style={getPartStyle("bck_34")}
+                onClick={() => handlePartClick("bck_32")}
+                style={getPartStyle("bck_32")}
                 d="M1085.855,596.351c-18.408,0-19.756-9.913-46.273-9.913c-19.295,0-46.359,4.894-58.938,11.567c-6.713,17.528-14.281,38.953-18.144,54.995c-5.731,23.808-6.991,46.636-7.209,63.701c29.158,39.25,78.172,59.463,116.954,24c0.208-1.105,0.721-1.672,1.672-2.2c1.5-0.834,5.25-6.916,6.25-8.75c1-1.834-0.5-4.25,2.667-4.25c3.166,0,2.166,2.167,3.083,4.417s5.25,6.833,6.75,9.25c0.244,0.393,0.419,0.7,0.55,0.957c38.418,35.821,87.089,16.505,116.521-22.031c-0.555-18.68-3.029-36.468-5.238-50.094c-3-18.5-9-41.667-13.666-53.667c-1.491-3.835-2.932-7.959-4.342-12.096c-10.295-8.089-35.108-15.792-54.368-15.691C1109.202,586.666,1102.916,596.351,1085.855,596.351z"
               />
               <path
                 id="OMBRO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_35")}
-                style={getPartStyle("bck_35")}
+                onClick={() => handlePartClick("bck_33")}
+                style={getPartStyle("bck_33")}
                 d="M1195.283,306.354c1.267,7.32,0.281,14.678-1.402,21.604c15.378,16.313,36.147,29.67,48.012,42.064c-2.872-15.51-2.674-29.3-12.393-66.522c-9.696-37.136-34.926-40.147-61.182-45.321c-0.318-0.063-0.636-0.124-0.953-0.184C1186.7,273.266,1194.072,299.356,1195.283,306.354z"
               />
               <path
                 id="OMBRO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_36")}
-                style={getPartStyle("bck_36")}
+                onClick={() => handlePartClick("bck_34")}
+                style={getPartStyle("bck_34")}
                 d="M971.848,328.337c-1.024-4.732-1.793-10.124-1.741-16.199c0.101-11.807,7.732-38.231,28.639-52.963c-3.144,0.418-6.204,0.747-9.079,0.993c-19.5,1.667-29.999,7.167-40.666,17.667s-12.833,29-16.5,42.167s-6.166,32.833-8.666,47.667c-0.186,1.098-0.394,2.236-0.618,3.4C934.8,358.473,956.07,344.937,971.848,328.337z"
               />
               <path
                 id="BRACO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_37")}
-                style={getPartStyle("bck_37")}
+                onClick={() => handlePartClick("bck_35")}
+                style={getPartStyle("bck_35")}
                 d="M1251.415,486.132c8.355-3.299,16.792-6.843,19.493-19.357c-2.969-9.552-5.826-22.777-10.408-36.525c-2.616-7.848-10.031-27.096-16.289-50.052c-0.987-3.621-1.719-6.936-2.318-10.176c-11.864-12.394-32.634-25.751-48.012-42.064c-2.26,9.295-5.78,17.813-6.822,24.408c-1.384,8.748-1.486,16.841-1.19,24.633c3.607,7.351,20.851,53.065,21.882,55.501c1.122,2.652,13.73,35.901,15.75,40c0.62,1.258,1.399,3.698,2.203,6.554C1232.26,487.68,1241.016,490.238,1251.415,486.132z"
               />
               <path
                 id="BRACO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_38")}
-                style={getPartStyle("bck_38")}
+                onClick={() => handlePartClick("bck_36")}
+                style={getPartStyle("bck_36")}
                 d="M976.471,346.082c-0.654-4.221-2.973-10.122-4.623-17.745c-15.777,16.6-37.048,30.136-48.632,42.729c-2.809,14.561-8.512,33.735-12.216,43.767c-4,10.833-11.333,33.333-15.333,47.333c-0.271,0.947-0.549,1.88-0.832,2.804c2.254,13.99,11.088,17.709,19.832,21.162c9.813,3.874,18.164,1.82,24.583-5.67c2.101-7.862,12.472-30.725,17.084-43.129c4.833-13,21.75-56.583,22.666-59.333c0.261-0.782,0.541-1.306,0.817-1.608C980.569,358.587,977.405,352.102,976.471,346.082z"
               />
               <path
                 id="COTOVELO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_39")}
-                style={getPartStyle("bck_39")}
+                onClick={() => handlePartClick("bck_37")}
+                style={getPartStyle("bck_37")}
                 d="M1260.719,517.093c17.666-5.388,26.376-3.416,31.051,0.222c-3.516-10.317-7.056-17.939-8.02-19.565c-1.571-2.652-5.5-13.5-10-23.25c-0.994-2.155-1.924-4.77-2.842-7.725c-2.701,12.514-11.138,16.058-19.493,19.357c-10.399,4.106-19.155,1.547-25.712-7.079c1.814,6.445,3.757,15.015,4.297,16.946c1.396,4.992,3.128,13.186,4.25,18.25c0.746,3.363,1.607,9.433,4.883,20.598C1241.495,525.172,1254.375,519.027,1260.719,517.093z"
               />
               <path
                 id="COTOVELO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_40")}
-                style={getPartStyle("bck_40")}
+                onClick={() => handlePartClick("bck_38")}
+                style={getPartStyle("bck_38")}
                 d="M914.667,486.132c-8.744-3.453-17.578-7.172-19.832-21.162c-3.906,12.737-8.94,23.293-12.669,31.529c-2.147,4.742-5.686,12.941-8.969,21.789c4.363-4.216,12.979-7.047,32.166-1.196c6.256,1.908,18.88,7.908,21.492,17.355c2.269-8.254,4.666-21.363,6.145-25.947c1.666-5.167,4.666-20.333,6-27c0.061-0.306,0.149-0.66,0.25-1.038C932.831,487.953,924.479,490.006,914.667,486.132z"
               />
               <path
                 id="ANTEBRACO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_41")}
-                style={getPartStyle("bck_41")}
+                onClick={() => handlePartClick("bck_39")}
+                style={getPartStyle("bck_39")}
                 d="M1313.271,621.668c-6.903-23.147-12.489-67.07-15.521-82.418c-1.548-7.837-3.76-15.422-5.98-21.935c-4.675-3.638-13.385-5.609-31.051-0.222c-6.344,1.934-19.224,8.08-21.586,17.755c1.655,5.645,3.927,12.588,7.117,21.152c9.197,24.688,23.002,50.249,35.914,77.07c0.09,0.187,0.26,0.683,0.494,1.392c5.866-0.635,13.676-2.687,18.501-4.877C1307.249,626.819,1311.627,624.546,1313.271,621.668z"
               />
               <path
                 id="ANTEBRACO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_42")}
-                style={getPartStyle("bck_42")}
+                onClick={() => handlePartClick("bck_40")}
+                style={getPartStyle("bck_40")}
                 d="M905.363,517.093c-19.187-5.851-27.803-3.02-32.166,1.196c-2.832,7.635-5.474,15.751-6.863,22.545c-3,14.667-3.834,31.167-6.167,46.5c-1.317,8.659-4.655,21.356-8.076,31.76c0.04,4.225,5.042,6.953,12.832,10.491c4.603,2.09,11.921,4.052,17.679,4.78c5.512-11.326,14.676-28.423,20.898-41.531c7.833-16.5,20-47.833,22.5-55.5c0.281-0.864,0.567-1.838,0.855-2.886C924.243,525,911.619,519,905.363,517.093z"
               />
               <path
                 id="PUNHO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_43")}
-                style={getPartStyle("bck_43")}
+                onClick={() => handlePartClick("bck_41")}
+                style={getPartStyle("bck_41")}
                 d="M1315.5,628.25c-0.757-1.922-1.5-4.138-2.229-6.582c-1.644,2.878-6.021,5.151-12.111,7.916c-4.825,2.191-12.635,4.242-18.501,4.877c0.587,1.78,1.59,4.951,2.842,8.288c1.156,3.081,2.127,7.941,2.679,12.28c7.985-5.969,25.61-13.901,37.272-15.479C1321.674,637.721,1318.034,634.687,1315.5,628.25z"
               />
               <path
                 id="PUNHO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_44")}
-                style={getPartStyle("bck_44")}
+                onClick={() => handlePartClick("bck_42")}
+                style={getPartStyle("bck_42")}
                 d="M852.091,619.094c-2.638,8.02-5.324,14.679-7.175,17.073c-0.801,1.037-2.903,2.156-5.535,3.241c10.734,1.056,27.465,8.22,36.476,14.186c0.177-2.485,0.761-5.597,3.311-11.76c0.822-1.987,2.008-4.538,3.435-7.469c-5.758-0.728-13.076-2.69-17.679-4.78C857.133,626.047,852.131,623.319,852.091,619.094z"
               />
               <path
                 id="MAO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_45")}
-                style={getPartStyle("bck_45")}
+                onClick={() => handlePartClick("bck_43")}
+                style={getPartStyle("bck_43")}
                 d="M1364,661.25c-2.167-1.833-3.25-5.75-5.166-6.583c-4.294-1.868-5.833-3.5-10.167-5.667c-2.845-1.422-7.706-4.102-16-6.833c-2.291-0.755-4.781-1.438-7.216-2.616c-11.662,1.579-29.287,9.511-37.272,15.479c0.284,2.231,0.459,4.328,0.487,5.97c0.083,4.833,2.75,18,3.25,22.417s0.501,11.75,3.001,17.583s1.5,11.084,3.333,14.084s2.25,6.25,5.167,11.333s5.166,5.583,6.416,2.166s0-8.167-0.833-9.917s-1.917-7.582-2.334-10.416s-1.583-7.583-0.75-9.833s3.167,2.417,3.334,4.5s1.416,12.333,2.083,16.333s2.25,14.083,3.417,19.083s4.5,8.584,6.833,7.084s2.75-6.834,2.583-9.084s-1.416-12.499-1.583-15.583s-1.666-15.75-1.916-17.5s2.25-1.583,2.75,0.584c0.5,2.166,2.083,9.583,2.833,13c0.75,3.416,2.916,15.416,3.666,21.666s4.917,10.25,7.5,10.417s3.084-6.667,3.167-9.167s-1-12.5-1.5-15.333s-4.25-24.833-3.167-24.833s3.584,14.75,4.834,21.25s2.75,13,6.667,13.083s3.25-4.833,3.416-12.75s-0.75-13.917-2.333-25.25s-3.333-17.917-4.417-22s-3.166-10.75-2.083-12.583s7.5,1.667,11.333,5.167s10.834,4.5,13.25,2.5S1366.167,663.083,1364,661.25z"
               />
               <path
                 id="MAO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_46")}
-                style={getPartStyle("bck_46")}
+                onClick={() => handlePartClick("bck_44")}
+                style={getPartStyle("bck_44")}
                 d="M824.75,644.167c-5.917,1.667-7.083,4.167-11.833,6.417s-9.75,6.167-10.417,7.25s-2.75,2.917-5.166,5.667c-2.417,2.75-0.834,5.583,1.833,6.417s7.75-0.5,11.25-3.333s6.75-4.667,9.167-5.75c2.416-1.083,3.416,0.417,3.666,2.083s-2.583,9.583-4,14s-1.416,6.833-1.916,10.5s-2.584,12.917-3.25,17.667c-0.667,4.75-1.418,14.416-1.5,19.25c-0.084,4.834,0.832,8.75,3.332,9.083s4.584-2,5.334-5.667s2.5-10.084,2.916-13.834c0.417-3.75,2.584-12.666,3.084-14.332c0.5-1.667,2.084-1.084,1.834,0.35c-0.25,1.435-1,5.482-1.5,8.15c-0.5,2.666-2.417,13.5-3.084,17.166s-1.5,14-1.334,18.167c0.167,4.167,2.834,6,5.168,4.833c2.333-1.167,4.582-6.5,5.332-10.75s2.168-10,3-15.25c0.834-5.25,2.918-15.083,4-18.583c1.084-3.5,2.418-0.917,2.334,0.917c-0.084,1.833-0.834,4.333-1,8.916s-1,15.584-1.5,19.834s-1.416,11,1.584,12.166s5.166-2.5,6.416-6.166c1.25-3.666,2.417-12.084,3.417-16.75c1-4.667,2.083-15.334,2.833-18.834s2.084-6.25,2.917-5.666c0.833,0.583,0.75,3.916,0,7.583s-1.667,9.75-2.667,13.5s-3.25,10.083,0,11.417c3.25,1.334,5.584-3.917,7-7.584s2.917-6.416,4.084-11c1.166-4.584,1.666-3.375,3.416-12.066c1.75-8.69,1.375-11.309,3.125-21.059s2.709-17.208,3.041-21.208c0.121-1.45,0.091-2.661,0.19-4.074c-9.011-5.966-25.741-13.13-36.476-14.186C834.767,641.309,828.518,643.106,824.75,644.167z"
               />
               <path
                 id="POSTERIOR_COXA_D_F"
-                onClick={() => handlePartClick("bck_47")}
-                style={getPartStyle("bck_47")}
+                onClick={() => handlePartClick("bck_45")}
+                style={getPartStyle("bck_45")}
                 d="M1093.217,740.125c0.668,1.323,0.02,1.214-0.05,3.376c-0.083,2.583-0.833,6.832-0.333,16.332s3,33.5,6.166,48.667s3.5,45.5,3.166,59.333c-0.333,13.833-1.832,43.333-2,53c-0.1,5.755,0.215,21.138,0.662,35.072c8.068,8.272,22.294,10.98,36.449,10.092c13.415-0.841,28.719-4.327,41.309-20.48c1.438-8.746,2.678-16.652,3.081-21.016c1-10.833,4.5-31.167,6.5-44.667s9.166-56.5,11.5-71.5s8.333-44.334,9.833-70c0.396-6.763,0.437-13.557,0.238-20.24C1180.306,756.63,1131.635,775.946,1093.217,740.125z"
               />
               <path
                 id="POSTERIOR_COXA_E_F"
-                onClick={() => handlePartClick("bck_48")}
-                style={getPartStyle("bck_48")}
+                onClick={() => handlePartClick("bck_46")}
+                style={getPartStyle("bck_46")}
                 d="M955.291,716.701c-0.029,2.288-0.041,4.48-0.041,6.549c0,17.5,1.75,35.25,3.75,48s13.25,79.25,16,96.25c2.169,13.408,7.447,52.006,11.381,76.551c12.795,17.416,28.61,21.08,42.423,21.946c13.647,0.857,27.359-1.631,35.557-9.223c0.568-15.524,0.901-32.5,0.64-40.274c-0.5-14.833-2.25-56-2.125-67.875s2.625-35,4.25-43.75s4.959-31.457,5.209-41.624c0.25-10.167,0-17-0.167-20c-0.062-1.098-0.042-1.912,0.078-2.55C1033.463,776.164,984.449,755.951,955.291,716.701z"
               />
               <path
                 id="JOELHO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_49")}
-                style={getPartStyle("bck_49")}
+                onClick={() => handlePartClick("bck_47")}
+                style={getPartStyle("bck_47")}
                 d="M1137.277,965.997c-14.155,0.889-28.381-1.82-36.449-10.092c0.304,9.472,0.668,18.274,1.006,22.928c0.833,11.5,5.832,24.167,5.832,40.667c0,3.606-0.085,6.959-0.251,10.211c5.991-5.396,22.928-10.366,35.706-11.734c11.358-1.217,24.285,0.893,30.771,10.977c-0.72-4.93-1.486-9.509-2.059-13.453c-1.5-10.333-0.334-21.167,1.166-34.334c0.896-7.864,3.456-22.682,5.586-35.65C1165.996,961.67,1150.692,965.156,1137.277,965.997z"
               />
               <path
                 id="JOELHO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_50")}
-                style={getPartStyle("bck_50")}
+                onClick={() => handlePartClick("bck_48")}
+                style={getPartStyle("bck_48")}
                 d="M1028.804,965.997c-13.813-0.866-29.628-4.53-42.423-21.946c1.054,6.575,2.012,12.146,2.786,15.949c3.667,18,2.667,23.833,4.167,33s0.833,17.5-1.667,33.5c-0.191,1.223-0.35,2.636-0.485,4.176c6.072-11.57,19.8-13.982,31.779-12.699c12.366,1.323,28.625,6.021,35.092,11.214c-0.223-4.039-0.335-7.883-0.386-11.357c-0.167-11.5,3.5-22.5,4.833-30.333c0.635-3.727,1.344-16.629,1.86-30.726C1056.163,964.366,1042.451,966.854,1028.804,965.997z"
               />
               <path
                 id="PANTURRILHA_D_F"
-                onClick={() => handlePartClick("bck_51")}
-                style={getPartStyle("bck_51")}
+                onClick={() => handlePartClick("bck_49")}
+                style={getPartStyle("bck_49")}
                 d="M1143.121,1017.977c-12.778,1.368-29.715,6.339-35.706,11.734c-0.594,11.627-2.289,21.885-5.415,37.122c-4,19.5-2.166,39.5-0.166,53.834s3,38.5,6.166,63.5c0.523,4.132,1.001,8.069,1.438,11.864c4.719,8.662,14.691,13.389,24.104,12.99c8.9-0.377,19.338-2.587,24.836-8.479c3.605-15.573,7.638-32.348,9.79-44.542c4-22.666,5.5-50.667,5.5-59.167s2.166-28.333,2.333-42.333c0.104-8.655-0.94-17.563-2.107-25.547C1167.406,1018.87,1154.479,1016.76,1143.121,1017.977z"
               />
               <path
                 id="PANTURRILHA_E_F"
-                onClick={() => handlePartClick("bck_52")}
-                style={getPartStyle("bck_52")}
+                onClick={() => handlePartClick("bck_50")}
+                style={getPartStyle("bck_50")}
                 d="M991.182,1030.676c-1.645,18.618,0.485,58.332,0.485,68.491c0,11,3.167,52.833,8,69.666c2.067,7.199,4.53,18.583,6.868,30.301c5.065,6.956,16.429,9.481,26.006,9.888c9.072,0.384,18.664-3.994,23.571-12.067c0.954-9.137,1.891-17.886,2.388-23.787c1.333-15.833,6.334-57.667,7-66.834s-0.166-34.5-3.5-48c-2.326-9.421-3.433-19.813-3.947-29.143c-6.467-5.192-22.726-9.891-35.092-11.214C1010.981,1016.693,997.254,1019.106,991.182,1030.676z"
               />
               <path
                 id="TORNOZELO_TRAS_D_F"
-                onClick={() => handlePartClick("bck_53")}
-                style={getPartStyle("bck_53")}
+                onClick={() => handlePartClick("bck_51")}
+                style={getPartStyle("bck_51")}
                 d="M1109.438,1196.031c2.207,19.166,3.259,34.28,2.563,47.636c-0.408,7.827-3.25,15-5.416,22.25c-2.167,7.25-0.167,12.749,1.166,16.666s1.584,7,0.584,11.5s1.25,14.084,1.416,19.084c0.101,3.019,0.029,7.617,1.324,12.31c5.011-8.101,30.007-8.45,35.653,6.138c0.716-0.778,1.365-1.59,1.947-2.401c0.425-6.792,0.573-15.504,0.342-18.777c-0.809-11.434-1.615-18.82,1.506-29.082c-0.119-0.115-0.241-0.226-0.355-0.353c-1.5-1.667-1-7.333-1.333-10.667s0.5-18.833,2.666-36c1.001-7.932,3.781-20.418,6.877-33.791c-5.498,5.892-15.936,8.102-24.836,8.479C1124.129,1209.42,1114.156,1204.693,1109.438,1196.031z"
               />
               <path
                 id="TORNOZELO_TRAS_E_F"
-                onClick={() => handlePartClick("bck_54")}
-                style={getPartStyle("bck_54")}
+                onClick={() => handlePartClick("bck_52")}
+                style={getPartStyle("bck_52")}
                 d="M1032.541,1209.021c-9.577-0.406-20.94-2.932-26.006-9.888c3.129,15.682,6.034,31.961,7.465,39.616c2.5,13.375,2.667,35.916,2.084,40c-0.144,1.009-0.375,1.654-0.679,2.092c3.308,10.532,2.482,17.97,1.66,29.594c-0.249,3.515-0.06,13.297,0.44,20.242c0.507,0.56,1.034,1.105,1.598,1.626c4.882-14.596,28.534-15.045,35.094-7.896c1.65-5.945,1.032-11.148,2.053-18.408c1.125-8-0.125-13.125-0.5-16.625s1.875-5.125,3.375-12.125s-1.125-12.875-3-19.625s-2.458-13.625-2.958-22.959c-0.313-5.855,1.34-22.334,2.945-37.712C1051.205,1205.027,1041.613,1209.405,1032.541,1209.021z"
               />
               <path
                 id="SOLA_PE_D_F"
-                onClick={() => handlePartClick("bck_55")}
-                style={getPartStyle("bck_55")}
+                onClick={() => handlePartClick("bck_53")}
+                style={getPartStyle("bck_53")}
                 d="M1111.074,1325.477c0.85,3.079,2.283,6.199,4.76,8.939c6.25,6.916,20.083,3.834,25.833,1.084c1.966-0.94,3.644-2.342,5.061-3.886C1141.081,1317.026,1116.085,1317.376,1111.074,1325.477z"
               />
               <path
                 id="SOLA_PE_E_F"
-                onClick={() => handlePartClick("bck_56")}
-                style={getPartStyle("bck_56")}
+                onClick={() => handlePartClick("bck_54")}
+                style={getPartStyle("bck_54")}
                 d="M1019.104,1332.304c4.011,3.708,9.41,6.354,16.021,6.821c10.625,0.75,16.125-6.125,18.5-12.875c0.22-0.625,0.403-1.236,0.572-1.842C1047.638,1317.259,1023.985,1317.708,1019.104,1332.304z"
               />
               <path
                 id="PE_TRAS_D_F"
-                onClick={() => handlePartClick("bck_57")}
-                style={getPartStyle("bck_57")}
+                onClick={() => handlePartClick("bck_55")}
+                style={getPartStyle("bck_55")}
                 d="M1149.017,1310.436c0.231,3.273,0.083,11.985-0.342,18.777c1.638-2.285,2.762-4.545,3.409-5.88c1.334-2.75,9.5-11.333,12.75-14.916s2.499-5.084,2.499-7.084s2-2,2.5-5.333s-1.833-4.833-2.916-5.583s-4.084-0.75-4.25-1.417s-1.25-1.917-3.167-2.917s-4,0.667-4.917-1.083c-0.847-1.617-2.613-2.247-4.061-3.646C1147.401,1291.615,1148.208,1299.002,1149.017,1310.436z"
               />
               <path
                 id="PE_TRAS_E_F"
-                onClick={() => handlePartClick("bck_58")}
-                style={getPartStyle("bck_58")}
+                onClick={() => handlePartClick("bck_56")}
+                style={getPartStyle("bck_56")}
                 d="M1017.065,1310.436c0.822-11.624,1.647-19.062-1.66-29.594c-0.925,1.334-2.522,0.714-4.405,2.408c-1.34,1.206-1.584,2.583-3.834,2.667s-4.666,2.25-5.5,3.75c-0.833,1.5-2.749,0.25-4.916,1.416s-3,3.667-2.416,6.25c0.583,2.583,2.333,3.25,2.416,4.917s1,4.25,3.75,7.75s9.25,7.25,12.875,14.625c1.053,2.142,2.442,4.193,4.131,6.053C1017.006,1323.732,1016.816,1313.95,1017.065,1310.436z"
               />
             </svg>
@@ -2485,1574 +2379,90 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
             </button>
           </div>
         </div>
-        {showHeadModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedHeadOption}
-                onChange={(e) => setSelectedHeadOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {headOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedHeadOption) {
-                    const option = headOptions.find(
-                      (o) => o.label === selectedHeadOption
-                    );
-                    if (option) handleSubpartSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveHead}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowHeadModal(false);
-                  setHeadPartId(null);
-                  setSelectedHeadOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showAbdomenModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedAbdomenOption}
-                onChange={(e) => setSelectedAbdomenOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {abdomenOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedAbdomenOption) {
-                    const option = abdomenOptions.find(
-                      (o) => o.label === selectedAbdomenOption
-                    );
-                    if (option) handleAbdomenSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveAbdomen}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowAbdomenModal(false);
-                  setAbdomenPartId(null);
-                  setSelectedAbdomenOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showBackModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedBackOption}
-                onChange={(e) => setSelectedBackOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {backOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedBackOption) {
-                    const option = backOptions.find(
-                      (o) => o.label === selectedBackOption
-                    );
-                    if (option) handleBackSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveBack}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowBackModal(false);
-                  setBackPartId(null);
-                  setSelectedBackOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showPelvisModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedPelvisOption}
-                onChange={(e) => setSelectedPelvisOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {pelvisOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedPelvisOption) {
-                    const option = pelvisOptions.find(
-                      (o) => o.label === selectedPelvisOption
-                    );
-                    if (option) handlePelvisSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemovePelvis}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowPelvisModal(false);
-                  setPelvisPartId(null);
-                  setSelectedPelvisOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightShoulderModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightShoulderOption}
-                onChange={(e) => setSelectedRightShoulderOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightShoulderOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightShoulderOption) {
-                    const option = rightShoulderOptions.find(
-                      (o) => o.label === selectedRightShoulderOption
-                    );
-                    if (option) handleRightShoulderSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightShoulder}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightShoulderModal(false);
-                  setRightShoulderPartId(null);
-                  setSelectedRightShoulderOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftShoulderModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftShoulderOption}
-                onChange={(e) => setSelectedLeftShoulderOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftShoulderOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftShoulderOption) {
-                    const option = leftShoulderOptions.find(
-                      (o) => o.label === selectedLeftShoulderOption
-                    );
-                    if (option) handleLeftShoulderSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftShoulder}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftShoulderModal(false);
-                  setLeftShoulderPartId(null);
-                  setSelectedLeftShoulderOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightArmModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightArmOption}
-                onChange={(e) => setSelectedRightArmOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightArmOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightArmOption) {
-                    const option = rightArmOptions.find(
-                      (o) => o.label === selectedRightArmOption
-                    );
-                    if (option) handleRightArmSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightArm}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightArmModal(false);
-                  setRightArmPartId(null);
-                  setSelectedRightArmOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftArmModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftArmOption}
-                onChange={(e) => setSelectedLeftArmOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftArmOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftArmOption) {
-                    const option = leftArmOptions.find(
-                      (o) => o.label === selectedLeftArmOption
-                    );
-                    if (option) handleLeftArmSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftArm}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftArmModal(false);
-                  setLeftArmPartId(null);
-                  setSelectedLeftArmOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightElbowModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightElbowOption}
-                onChange={(e) => setSelectedRightElbowOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightElbowOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightElbowOption) {
-                    const option = rightElbowOptions.find(
-                      (o) => o.label === selectedRightElbowOption
-                    );
-                    if (option) handleRightElbowSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightElbow}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightElbowModal(false);
-                  setRightElbowPartId(null);
-                  setSelectedRightElbowOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftElbowModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftElbowOption}
-                onChange={(e) => setSelectedLeftElbowOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftElbowOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftElbowOption) {
-                    const option = leftElbowOptions.find(
-                      (o) => o.label === selectedLeftElbowOption
-                    );
-                    if (option) handleLeftElbowSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftElbow}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftElbowModal(false);
-                  setLeftElbowPartId(null);
-                  setSelectedLeftElbowOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightForearmModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightForearmOption}
-                onChange={(e) => setSelectedRightForearmOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightForearmOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightForearmOption) {
-                    const option = rightForearmOptions.find(
-                      (o) => o.label === selectedRightForearmOption
-                    );
-                    if (option) handleRightForearmSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightForearm}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightForearmModal(false);
-                  setRightForearmPartId(null);
-                  setSelectedRightForearmOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftForearmModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftForearmOption}
-                onChange={(e) => setSelectedLeftForearmOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftForearmOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftForearmOption) {
-                    const option = leftForearmOptions.find(
-                      (o) => o.label === selectedLeftForearmOption
-                    );
-                    if (option) handleLeftForearmSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftForearm}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftForearmModal(false);
-                  setLeftForearmPartId(null);
-                  setSelectedLeftForearmOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightHandModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightHandOption}
-                onChange={(e) => setSelectedRightHandOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightHandOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightHandOption) {
-                    const option = rightHandOptions.find(
-                      (o) => o.label === selectedRightHandOption
-                    );
-                    if (option) handleRightHandSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightHand}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightHandModal(false);
-                  setRightHandPartId(null);
-                  setSelectedRightHandOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftHandModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftHandOption}
-                onChange={(e) => setSelectedLeftHandOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftHandOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftHandOption) {
-                    const option = leftHandOptions.find(
-                      (o) => o.label === selectedLeftHandOption
-                    );
-                    if (option) handleLeftHandSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftHand}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftHandModal(false);
-                  setLeftHandPartId(null);
-                  setSelectedLeftHandOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showRightFootModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedRightFootOption}
-                onChange={(e) => setSelectedRightFootOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {rightFootOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedRightFootOption) {
-                    const option = rightFootOptions.find(
-                      (o) => o.label === selectedRightFootOption
-                    );
-                    if (option) handleRightFootSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveRightFoot}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowRightFootModal(false);
-                  setRightFootPartId(null);
-                  setSelectedRightFootOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-        {showLeftFootModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                maxWidth: "400px",
-                width: "90%",
-              }}
-            >
-              <h3>Selecione a parte atingida:</h3>
-              <select
-                value={selectedLeftFootOption}
-                onChange={(e) => setSelectedLeftFootOption(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <option value="">Selecione uma opção</option>
-                {leftFootOptions.map((option) => (
-                  <option key={option.label} value={option.label}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => {
-                  if (selectedLeftFootOption) {
-                    const option = leftFootOptions.find(
-                      (o) => o.label === selectedLeftFootOption
-                    );
-                    if (option) handleLeftFootSelect(option);
-                  }
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#d4edda",
-                  cursor: "pointer",
-                }}
-              >
-                Selecionar
-              </button>
-              <button
-                onClick={handleRemoveLeftFoot}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fdd",
-                  cursor: "pointer",
-                }}
-              >
-                Remover lesão nesta parte
-              </button>
-              <button
-                onClick={() => {
-                  setShowLeftFootModal(false);
-                  setLeftFootPartId(null);
-                  setSelectedLeftFootOption("");
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  margin: "5px 0",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#eee",
-                  cursor: "pointer",
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
+        <BodyPartModal
+          show={showHeadModal}
+          title={headPartId ? partNames[headPartId] : "Selecione a parte atingida:"}
+          options={currentHeadOptions}
+          selectedOption={selectedHeadOption}
+          onOptionChange={setSelectedHeadOption}
+          onSelect={handleSubpartSelect}
+          onRemove={handleRemoveHead}
+          onCancel={() => {
+            setShowHeadModal(false);
+            setHeadPartId(null);
+            setSelectedHeadOption("");
+          }}
+        />
+        <BodyPartModal
+          show={showAbdomenModal}
+          title={abdomenPartId ? partNames[abdomenPartId] : "Selecione a parte atingida:"}
+          options={abdomenOptions}
+          selectedOption={selectedAbdomenOption}
+          onOptionChange={setSelectedAbdomenOption}
+          onSelect={handleAbdomenSelect}
+          onRemove={handleRemoveAbdomen}
+          onCancel={() => {
+            setShowAbdomenModal(false);
+            setAbdomenPartId(null);
+            setSelectedAbdomenOption("");
+          }}
+        />
+        <BodyPartModal
+          show={showLeftHandModal}
+          title={leftHandPartId ? partNames[leftHandPartId] : "Selecione a parte atingida:"}
+          options={leftHandOptions}
+          selectedOption={selectedLeftHandOption}
+          onOptionChange={setSelectedLeftHandOption}
+          onSelect={handleLeftHandSelect}
+          onRemove={handleRemoveLeftHand}
+          onCancel={() => {
+            setShowLeftHandModal(false);
+            setLeftHandPartId(null);
+            setSelectedLeftHandOption("");
+          }}
+        />
+        <BodyPartModal
+          show={showRightHandModal}
+          title={rightHandPartId ? partNames[rightHandPartId] : "Selecione a parte atingida:"}
+          options={rightHandOptions}
+          selectedOption={selectedRightHandOption}
+          onOptionChange={setSelectedRightHandOption}
+          onSelect={handleRightHandSelect}
+          onRemove={handleRemoveRightHand}
+          onCancel={() => {
+            setShowRightHandModal(false);
+            setRightHandPartId(null);
+            setSelectedRightHandOption("");
+          }}
+        />
+        <BodyPartModal
+          show={showRightFootModal}
+          title={rightFootPartId ? partNames[rightFootPartId] : "Selecione a parte atingida:"}
+          options={rightFootOptions}
+          selectedOption={selectedRightFootOption}
+          onOptionChange={setSelectedRightFootOption}
+          onSelect={handleRightFootSelect}
+          onRemove={handleRemoveRightFoot}
+          onCancel={() => {
+            setShowRightFootModal(false);
+            setRightFootPartId(null);
+            setSelectedRightFootOption("");
+          }}
+        />
+        <BodyPartModal
+          show={showLeftFootModal}
+          title={leftFootPartId ? partNames[leftFootPartId] : "Selecione a parte atingida:"}
+          options={leftFootOptions}
+          selectedOption={selectedLeftFootOption}
+          onOptionChange={setSelectedLeftFootOption}
+          onSelect={handleLeftFootSelect}
+          onRemove={handleRemoveLeftFoot}
+          onCancel={() => {
+            setShowLeftFootModal(false);
+            setLeftFootPartId(null);
+            setSelectedLeftFootOption("");
+          }}
+        />
       </div>
     </>
   );

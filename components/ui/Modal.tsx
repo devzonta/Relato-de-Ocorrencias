@@ -14,11 +14,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, t
   const getTypeStyles = () => {
     switch (type) {
       case 'error':
-        return 'border-red-600 bg-red-50';
+        return 'bg-red-50';
       case 'warning':
-        return 'border-yellow-600 bg-yellow-50';
+        return 'bg-yellow-50';
       default:
-        return 'border-blue-600 bg-blue-50';
+        return 'bg-gray-50';
     }
   };
 
@@ -37,7 +37,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, t
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true">
-      <div className={`bg-white rounded-lg shadow-lg border-2 p-6 max-w-md w-full mx-4 ${getTypeStyles()}`}>
+      <div className={`bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4 ${getTypeStyles()}`}>
         <div className="flex justify-between items-center mb-4">
           <h2 id="modal-title" className="text-xl font-bold text-gray-800">{title}</h2>
           <button

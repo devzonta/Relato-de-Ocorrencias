@@ -65,9 +65,13 @@ function parseTurno(turnoStr: string): { turno: string, escala: string } {
 // Função para migrar dados do JSON para o banco
 export const migrateData = async () => {
   try {
+    const existingCount = await db.funcionarios.count();
+    if (existingCount > 0) {
+      console.log('Dados já existem no banco de dados, pulando migração.');
+      return;
+    }
     console.log('Iniciando migração de dados...');
     console.log('Número de registros no JSON:', listaPessoas.length);
-    // Sempre migra para garantir dados atualizados
     const funcionarios = (listaPessoas as any[]).map((p: any) => {
       const { turno, escala } = parseTurno(p.Turno || '');
       return {

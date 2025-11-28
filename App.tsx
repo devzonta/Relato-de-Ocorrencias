@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import BodyDiagram from "./components/BodyDiagram";
 import FrasleLogo from "./components/FrasleLogo";
+import { Modal } from './components/ui/Modal';
 import { migrateData } from "./database";
 import { FormState } from './types';
 import { FormRow, FormField } from './components/FormComponents';
@@ -59,6 +60,17 @@ const App: React.FC = () => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   // Labels dinâmicos para Gestor e Coordenador
   const [gestorLabel, setGestorLabel] = useState('Gestor');
@@ -122,7 +134,7 @@ const App: React.FC = () => {
     removeImage,
     showNotification,
     handleCopy,
-  } = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setGestorLabel, setCoordenadorLabel);
+  } = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setModal, setGestorLabel, setCoordenadorLabel);
 
 
 
@@ -138,16 +150,26 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
+
       {/* Floating Buttons */}
       <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
         <button
           onClick={() => handleCopy(formData, selectedBodyParts, images)}
           className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
-          title="Copiar Relato"
+          title="Gerar Imagem PNG"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="9" cy="9" r="2"></circle>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
           </svg>
         </button>
       </div>

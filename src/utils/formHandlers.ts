@@ -15,6 +15,7 @@ export const createFormHandlers = (
     type: 'error' | 'warning' | 'info';
   }>>
 ) => {
+  let lastCheckedMatricula = '';
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -84,6 +85,12 @@ export const createFormHandlers = (
   const fillMatriculaData = async (matricula: string) => {
     console.log('Buscando matrícula:', matricula);
 
+    if (matricula === lastCheckedMatricula) {
+      return; // Já verificado, não mostrar modal novamente
+    }
+
+    lastCheckedMatricula = matricula;
+
     if (matricula) {
       try {
         const funcionario = await db.funcionarios.get(matricula);
@@ -112,8 +119,8 @@ export const createFormHandlers = (
           setModal({
             isOpen: true,
             title: "Matrícula não encontrada",
-            message: "A matrícula digitada não foi encontrada na base de dados.",
-            type: 'error'
+            message: "Matrícula não encontrada na base de dados. Preencha os campos manualmente.",
+            type: 'info'
           });
         }
       } catch (error) {
@@ -131,6 +138,11 @@ export const createFormHandlers = (
   const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFormData((prev) => ({ ...prev, matricula: value }));
+
+    // Resetar a última matrícula verificada se o valor mudou
+    if (value !== lastCheckedMatricula) {
+      lastCheckedMatricula = '';
+    }
 
     if (setIsAutoFilled) {
       setIsAutoFilled(false);
