@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import BodyDiagram from "./components/BodyDiagram";
 import FrasleLogo from "./components/FrasleLogo";
+import { Modal } from './components/ui/Modal';
 import { FormRow, FormField } from './components/FormComponents';
 import { useFormState } from './hooks/useFormState';
 import { useAutocomplete } from './hooks/useAutocomplete';
@@ -20,6 +21,18 @@ const App: React.FC = () => {
     setNotification,
   } = useFormState();
 
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+  });
+
   const autocompleteStates = useAutocomplete();
 
   const {
@@ -36,6 +49,7 @@ const App: React.FC = () => {
     setImages,
     setIsDragOver,
     setNotification,
+    setModal,
     autocompleteStates
   );
 
@@ -46,7 +60,6 @@ const App: React.FC = () => {
     handleAcoesNecessariasKeyPress,
     handleAcoesImediatasKeyPress,
     handleMatriculaKeyPress,
-    handleMatriculaBlur,
     handleMatriculaChange,
     handleDragOver,
     handleDragLeave,
@@ -70,6 +83,15 @@ const App: React.FC = () => {
           {notification.message}
         </div>
       )}
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
 
       {/* Floating Buttons */}
       <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
@@ -280,7 +302,6 @@ const App: React.FC = () => {
                 value={formData.matricula}
                 onChange={handleMatriculaChange}
                 onKeyPress={handleMatriculaKeyPress}
-                onBlur={handleMatriculaBlur}
                 className="w-full bg-transparent focus:outline-none"
                 placeholder="Digite para buscar"
               />

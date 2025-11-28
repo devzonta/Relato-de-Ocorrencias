@@ -7,7 +7,13 @@ export const createFormHandlers = (
   setIsAutoFilled: React.Dispatch<React.SetStateAction<boolean>>,
   setImages: React.Dispatch<React.SetStateAction<File[]>>,
   setIsDragOver: React.Dispatch<React.SetStateAction<boolean>>,
-  setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' | 'info' } | null>>
+  setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' | 'info' } | null>>,
+  setModal: React.Dispatch<React.SetStateAction<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'info';
+  }>>
 ) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -74,10 +80,6 @@ export const createFormHandlers = (
     }
   };
 
-  const handleMatriculaBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-    const matricula = (e.target as HTMLInputElement).value.trim();
-    await fillMatriculaData(matricula);
-  };
 
   const fillMatriculaData = async (matricula: string) => {
     console.log('Buscando matrícula:', matricula);
@@ -107,11 +109,21 @@ export const createFormHandlers = (
             funcao: ""
           }));
           setIsAutoFilled(false);
-          alert("Matrícula não encontrada na base de dados!");
+          setModal({
+            isOpen: true,
+            title: "Matrícula não encontrada",
+            message: "A matrícula digitada não foi encontrada na base de dados.",
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error('Erro ao buscar funcionário:', error);
-        alert("Erro ao buscar dados do funcionário!");
+        setModal({
+          isOpen: true,
+          title: "Erro",
+          message: "Erro ao buscar dados do funcionário.",
+          type: 'error'
+        });
       }
     }
   };
@@ -191,7 +203,6 @@ export const createFormHandlers = (
     handleAcoesNecessariasKeyPress,
     handleAcoesImediatasKeyPress,
     handleMatriculaKeyPress,
-    handleMatriculaBlur,
     handleMatriculaChange,
     handleDragOver,
     handleDragLeave,

@@ -11,6 +11,12 @@ export const useFormHandlers = (
   setImages: React.Dispatch<React.SetStateAction<File[]>>,
   setIsDragOver: React.Dispatch<React.SetStateAction<boolean>>,
   setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' | 'info' } | null>>,
+  setModal: React.Dispatch<React.SetStateAction<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'info';
+  }>>,
   autocompleteStates: any // TODO: type properly
 ) => {
   const [isAutoFilled, setIsAutoFilled] = useState(false);
@@ -57,7 +63,7 @@ export const useFormHandlers = (
   });
 
   // Criar handlers de form
-  const formHandlers = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification);
+  const formHandlers = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setModal);
 
   // Criar handlers de export
   const exportHandlers = createExportHandlers(formData, [], setImages, setNotification); // TODO: selectedBodyParts

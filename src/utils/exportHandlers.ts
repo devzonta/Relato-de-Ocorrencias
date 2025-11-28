@@ -1,9 +1,10 @@
+import React from 'react';
 import * as htmlToImage from 'html-to-image';
 
 export const createExportHandlers = (
   formData: any,
   selectedBodyParts: string[],
-  images: File[],
+  setImages: React.Dispatch<React.SetStateAction<File[]>>,
   showNotification: (message: string, type: 'success' | 'error' | 'info') => void
 ) => {
   const handleCopy = async () => {
