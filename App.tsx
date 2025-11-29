@@ -176,7 +176,7 @@ const App: React.FC = () => {
 
       <div
         id="export-area"
-        style={{ width: "850px", margin: "0 auto" }}
+        style={{ width: "1000px", margin: "0 auto" }}
         className="bg-white shadow-lg border-2 border-black"
       >
         {/* Header */}
@@ -257,7 +257,7 @@ const App: React.FC = () => {
           </div>
 
           <FormRow>
-            <div className="flex-1 p-1 border-r border-gray-400 flex items-center space-x-4">
+            <div className="flex-3 p-1 border-r border-gray-400 flex items-center space-x-4">
               <span className="font-bold">Classificação prévia:</span>
               <label className="flex items-center">
                 <input
@@ -320,8 +320,8 @@ const App: React.FC = () => {
                 ATENDIMENTO AMBULATORIAL
               </label>
             </div>
-            <div className="p-1 flex items-center space-x-4">
-              <span className="font-bold mr-2">Classificação potencial:</span>
+            <div className="flex-1 p-1 flex items-center space-x-4">
+              <span className="font-bold mr-2">Classificação previa potencial:</span>
               <label className="flex items-center">
                 <input
                   type="checkbox"

@@ -109,7 +109,7 @@ const App: React.FC = () => {
 
       <div
         id="export-area"
-        style={{ width: "900px", margin: "0 auto" }}
+        style={{ width: "1000px", margin: "0 auto" }}
         className="bg-white shadow-lg border-2 border-black"
       >
         {/* Header */}
@@ -257,7 +257,7 @@ const App: React.FC = () => {
               </label>
             </div>
             <div className="p-1 flex items-center space-x-4">
-              <span className="font-bold mr-2">Classificação potencial:</span>
+              <span className="font-bold mr-2">Classificação previa potencial:</span>
               <label className="flex items-center">
                 <input
                   type="checkbox"
