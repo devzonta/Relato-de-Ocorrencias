@@ -2,17 +2,21 @@ import React from 'react';
 import { FormState, AutocompleteSetters, LocalAutocompleteSetters, SetorAutocompleteSetters, GestorAutocompleteSetters, CoordenadorAutocompleteSetters } from '../types';
 import { ssmaNames, localNames, setorNames, gestorNames, coordenadorNames } from '../config/constants.config';
 
+// Criar handlers para funcionalidade de autocomplete do campo Responsável SSMA
 export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
   const { setFormData, setShowAutocomplete, setFilteredNames, setHighlightedIndex } = setters;
 
+  // Handler para mudanças no campo Responsável SSMA com filtro de autocomplete
   const handleResponsavelSSMAChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toUpperCase();
     setFormData((prev) => ({ ...prev, responsavelSSMA: value }));
 
     if (value.trim() === "") {
+      // Esconder autocomplete se campo estiver vazio
       setFilteredNames([]);
       setShowAutocomplete(false);
     } else {
+      // Filtrar nomes que contenham o valor digitado
       const filtered = ssmaNames.filter(name =>
         name.toUpperCase().includes(value.toUpperCase())
       );
@@ -22,6 +26,7 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
     }
   };
 
+  // Handler para seleção de item do autocomplete
   const handleAutocompleteSelect = (name: string) => {
     setFormData((prev) => ({ ...prev, responsavelSSMA: name }));
     setShowAutocomplete(false);
@@ -29,6 +34,7 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
     setHighlightedIndex(-1);
   };
 
+  // Handler para navegação por teclado no autocomplete
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!setters.setShowAutocomplete || setters.setFilteredNames.length === 0) return;
 
@@ -58,6 +64,7 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
     }
   };
 
+  // Handler para quando o campo perde o foco
   const handleBlur = () => {
     setTimeout(() => {
       setShowAutocomplete(false);
@@ -68,6 +75,8 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
   return { handleResponsavelSSMAChange, handleAutocompleteSelect, handleKeyDown, handleBlur };
 };
 
+// Criar handlers para funcionalidade de autocomplete do campo Local
+// (Segue o mesmo padrão dos handlers de Responsável SSMA)
 export const createLocalHandlers = (setters: LocalAutocompleteSetters) => {
   const { setFormData, setShowLocalAutocomplete, setFilteredLocalNames, setHighlightedLocalIndex } = setters;
 
@@ -134,7 +143,8 @@ export const createLocalHandlers = (setters: LocalAutocompleteSetters) => {
   return { handleLocalChange, handleLocalSelect, handleLocalKeyDown, handleLocalBlur };
 };
 
-// Similar para setor, gestor, coordenador
+// Criar handlers para funcionalidade de autocomplete do campo Setor
+// (Segue o mesmo padrão dos handlers anteriores)
 export const createSetorHandlers = (setters: SetorAutocompleteSetters) => {
   const { setFormData, setShowSetorAutocomplete, setFilteredSetorNames, setHighlightedSetorIndex } = setters;
 
@@ -201,6 +211,8 @@ export const createSetorHandlers = (setters: SetorAutocompleteSetters) => {
   return { handleSetorChange, handleSetorSelect, handleSetorKeyDown, handleSetorBlur };
 };
 
+// Criar handlers para funcionalidade de autocomplete do campo Gestor
+// (Segue o mesmo padrão dos handlers anteriores)
 export const createGestorHandlers = (setters: GestorAutocompleteSetters) => {
   const { setFormData, setShowGestorAutocomplete, setFilteredGestorNames, setHighlightedGestorIndex } = setters;
 
@@ -267,6 +279,8 @@ export const createGestorHandlers = (setters: GestorAutocompleteSetters) => {
   return { handleGestorChange, handleGestorSelect, handleGestorKeyDown, handleGestorBlur };
 };
 
+// Criar handlers para funcionalidade de autocomplete do campo Coordenador
+// (Segue o mesmo padrão dos handlers anteriores)
 export const createCoordenadorHandlers = (setters: CoordenadorAutocompleteSetters) => {
   const { setFormData, setShowCoordenadorAutocomplete, setFilteredCoordenadorNames, setHighlightedCoordenadorIndex } = setters;
 

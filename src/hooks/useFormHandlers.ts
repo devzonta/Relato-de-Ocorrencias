@@ -5,6 +5,7 @@ import { createResponsavelSSMAHandlers, createLocalHandlers, createSetorHandlers
 import { createFormHandlers } from '../utils/formHandlers';
 import { createExportHandlers } from '../utils/exportHandlers';
 
+// Hook principal para coordenar todos os handlers do formulário
 export const useFormHandlers = (
   formData: FormState,
   setFormData: React.Dispatch<React.SetStateAction<FormState>>,
@@ -19,14 +20,15 @@ export const useFormHandlers = (
   }>>,
   autocompleteStates: any // TODO: type properly
 ) => {
+  // Estado para controlar se o formulário foi preenchido automaticamente
   const [isAutoFilled, setIsAutoFilled] = useState(false);
 
-  // Migrar dados na inicialização
+  // Executar migração de dados na inicialização da aplicação
   useEffect(() => {
     migrateData();
   }, []);
 
-  // Criar handlers de autocomplete
+  // Inicializar handlers de autocomplete para cada campo
   const responsavelSSMAHandlers = createResponsavelSSMAHandlers({
     setFormData,
     setShowAutocomplete: autocompleteStates.setShowAutocomplete,
@@ -62,12 +64,13 @@ export const useFormHandlers = (
     setHighlightedCoordenadorIndex: autocompleteStates.setHighlightedCoordenadorIndex,
   });
 
-  // Criar handlers de form
+  // Inicializar handlers gerais do formulário
   const formHandlers = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setModal);
 
-  // Criar handlers de export
+  // Inicializar handlers de exportação de relatório
   const exportHandlers = createExportHandlers(formData, [], setImages, setNotification); // TODO: selectedBodyParts
 
+  // Retornar todos os handlers organizados por categoria
   return {
     isAutoFilled,
     responsavelSSMAHandlers,

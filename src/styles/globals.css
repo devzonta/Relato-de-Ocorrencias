@@ -36,9 +36,9 @@
 }
 
 .force-print-capture #export-area {
-    /* Força o elemento a ser renderizado com sua largura total de 900px,
-       mas sem margens de centralização que podem ser cortadas */
-    width: 900px !important; /* Mantém a largura original do formulário */
+    /* Força o elemento a ser renderizado com sua largura total de 850px,
+        mas sem margens de centralização que podem ser cortadas */
+    width: 850px !important; /* Largura reduzida do formulário */
     margin: 0 !important;
     box-shadow: none !important; /* Remove sombras que podem aparecer cortadas */
 }
@@ -71,4 +71,10 @@
     color: #000;
     background: #fff;
     border: 1px solid #000;
+}
+
+/* Remove barras de rolagem na seção de fotos durante a captura */
+.force-print-capture .overflow-y-auto {
+    overflow: hidden !important;
+    height: auto !important;
 }

@@ -44,7 +44,7 @@ export const createFormHandlers = (
     index: number,
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       setFormData((prev) => {
         if (
@@ -62,7 +62,7 @@ export const createFormHandlers = (
     index: number,
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       setFormData((prev) => {
         if (
@@ -256,6 +256,20 @@ export const createFormHandlers = (
 
     // Pequeno atraso para garantir que o DOM renderize as mudanças de classe
     await new Promise(r => setTimeout(r, 50));
+
+    // Recalcular alturas dos textareas para garantir que quebras de linha sejam exibidas
+    const textareas = exportArea.querySelectorAll('textarea');
+    textareas.forEach((textarea: HTMLTextAreaElement) => {
+      textarea.style.setProperty('height', 'auto', 'important');
+      textarea.style.setProperty('height', textarea.scrollHeight + 'px', 'important');
+    });
+
+    // Remover barras de rolagem da seção de fotos
+    const imagesContainer = exportArea.querySelector('.overflow-y-auto') as HTMLElement;
+    if (imagesContainer) {
+      imagesContainer.style.setProperty('overflow', 'hidden', 'important');
+      imagesContainer.style.setProperty('height', 'auto', 'important');
+    }
 
     try {
       // 2. Capturar com html-to-image

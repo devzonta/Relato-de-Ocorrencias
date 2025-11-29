@@ -176,7 +176,7 @@ const App: React.FC = () => {
 
       <div
         id="export-area"
-        style={{ width: "900px", margin: "0 auto" }}
+        style={{ width: "850px", margin: "0 auto" }}
         className="bg-white shadow-lg border-2 border-black"
       >
         {/* Header */}
@@ -688,8 +688,8 @@ const App: React.FC = () => {
                       }, 0);
                     }}
                     onKeyPress={(e) => handleAcoesImediatasKeyPress(index, e)}
-                    className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none overflow-hidden text-sm"
-                    style={{ height: "auto", minHeight: "1.5rem" }}
+                    className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-sm"
+                    style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
                     rows={1}
                     placeholder={
                       isLastField && acao === ""
@@ -718,10 +718,10 @@ const App: React.FC = () => {
 
           <div>
             <div className="flex border-b-2 border-black">
-              <div className="flex-1 min-w-80 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
+              <div className="flex-1 min-w-88 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
                 Ações Necessárias
               </div>
-              <div className="w-80 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
+              <div className="w-72 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
                 Responsável
               </div>
               <div className="w-24 bg-gray-500 p-1 font-bold text-center text-white">
@@ -739,7 +739,7 @@ const App: React.FC = () => {
                   key={index}
                   className="flex border-b border-gray-400 last:border-b-0 relative"
                 >
-                  <div className="flex-1 min-w-80 border-r border-gray-400">
+                  <div className="flex-1 min-w-88 border-r border-gray-400">
                     <textarea
                       value={item.acao}
                       onChange={(e) => {
@@ -766,12 +766,12 @@ const App: React.FC = () => {
                           ? "Digite as informações e pressione Enter para adicionar uma nova ação"
                           : ""
                       }
-                      className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none overflow-hidden text-sm"
-                      style={{ height: "auto", minHeight: "1.5rem" }}
+                      className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-sm"
+                      style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
                       rows={1}
                     />
                   </div>
-                  <div className="w-80 border-r border-gray-400">
+                  <div className="w-72 border-r border-gray-400">
                     <textarea
                       value={item.responsavel}
                       onChange={(e) => {
@@ -790,8 +790,11 @@ const App: React.FC = () => {
                           e.target.style.height = e.target.scrollHeight + "px";
                         }, 0);
                       }}
-                      className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none overflow-hidden text-center text-sm"
-                      style={{ height: "auto", minHeight: "1.5rem" }}
+                      onKeyPress={(e) =>
+                        handleAcoesNecessariasKeyPress(index, e)
+                      }
+                      className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-center text-sm"
+                      style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
                       rows={1}
                     />
                   </div>
@@ -807,7 +810,7 @@ const App: React.FC = () => {
                           acoesNecessarias: newAcoes,
                         }));
                       }}
-                      className="w-full p-0 focus:outline-none bg-transparent h-full text-xs text-center"
+                      className="w-full p-0 focus:outline-none bg-transparent h-full text-center"
                     />
                   </div>
                   {index > 0 && (
