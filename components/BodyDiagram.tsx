@@ -484,13 +484,13 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           newSet.delete(partId);
           return newSet;
         });
-        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "Dorso";
+        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "DORSO";
         setSelectedPartNames((prev) =>
           prev.filter((name) => name !== `${partNames[partId]}: ${label}: inclusive músculos dorsais, coluna e medula espinhal`)
         );
       } else {
         setSelectedParts((prev) => new Set(prev).add(partId));
-        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "Dorso";
+        const label = partNames[partId] === "LOMBAR" ? "LOMBAR" : "DORSO";
         setSelectedPartNames((prev) => [
           ...prev,
           `${partNames[partId]}: ${label}: inclusive músculos dorsais, coluna e medula espinhal`,
@@ -1615,9 +1615,9 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
             ? (() => {
                 const parts = selectedPartNames[0].split(": ");
                 if (parts.length === 3) {
-                  return parts[1];
+                  return `${parts[1]}: ${parts[2]}`;
                 } else {
-                  return parts[0];
+                  return selectedPartNames[0];
                 }
               })()
             : "SEM LESÃO"}
@@ -1628,13 +1628,13 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
                 if (parts.length === 3) {
                   return (
                     <div key={index}>
-                      {parts[1]}
+                      {parts[1]}: {parts[2]}
                     </div>
                   );
                 } else {
                   return (
                     <div key={index}>
-                      {parts[0]}
+                      {name}
                     </div>
                   );
                 }
