@@ -326,7 +326,6 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
     bck_55: "PÉ DIREITO (POSTERIOR)",
     bck_56: "PÉ ESQUERDO (POSTERIOR)",
     bck_57: "CABEÇA (POSTERIOR)",
-    bck_58: "PESCOÇO (POSTERIOR)",
     bck_59: "COSTAS",
     bck_60: "LOMBAR",
     bck_61: "NÁDEGAS",
@@ -450,8 +449,7 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
       }
     } else if (
       partId === "frt_3" ||
-      partId === "frt_30" ||
-      partId === "frt_31"
+      partId === "frt_30"
     ) {
       if (selectedParts.has(partId)) {
         setSelectedParts((prev) => {
@@ -471,6 +469,18 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
           ...prev,
           `${partNames[partId]}: TÓRAX: inclusive órgãos internos`,
         ]);
+      }
+    } else if (partId === "frt_31") {
+      if (selectedParts.has(partId)) {
+        setSelectedParts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(partId);
+          return newSet;
+        });
+        setSelectedPartNames((prev) => prev.filter((name) => name !== "MAMAS"));
+      } else {
+        setSelectedParts((prev) => new Set(prev).add(partId));
+        setSelectedPartNames((prev) => [...prev, "MAMAS"]);
       }
     } else if (
       partId === "bck_3" ||
@@ -833,23 +843,6 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
         setSelectedPartNames((prev) => [
           ...prev,
           `${partNames[partId]}: entre o tornozelo e a pélvis`,
-        ]);
-      }
-    } else if ((partId as string) === "bck_58") {
-      if (selectedParts.has(partId)) {
-        setSelectedParts((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(partId);
-          return newSet;
-        });
-        setSelectedPartNames((prev) =>
-          prev.filter((name) => name !== `${partNames[partId]}: PESCOÇO: `)
-        );
-      } else {
-        setSelectedParts((prev) => new Set(prev).add(partId));
-        setSelectedPartNames((prev) => [
-          ...prev,
-          `${partNames[partId]}: PESCOÇO: `,
         ]);
       }
     } else if ((partId as string) === "bck_59") {
@@ -1615,9 +1608,9 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
             ? (() => {
                 const parts = selectedPartNames[0].split(": ");
                 if (parts.length === 3) {
-                  return `${parts[1]}: ${parts[2]}`;
+                  return parts[1];
                 } else {
-                  return selectedPartNames[0];
+                  return parts[0];
                 }
               })()
             : "SEM LESÃO"}
@@ -1628,13 +1621,13 @@ const BodyDiagram: React.FC<BodyDiagramProps> = ({ onSelectionChange }) => {
                 if (parts.length === 3) {
                   return (
                     <div key={index}>
-                      {parts[1]}: {parts[2]}
+                      {parts[1]}
                     </div>
                   );
                 } else {
                   return (
                     <div key={index}>
-                      {name}
+                      {parts[0]}
                     </div>
                   );
                 }

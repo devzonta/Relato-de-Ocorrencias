@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BodyDiagram from "./components/BodyDiagram";
+import BodyDiagram from "../components/BodyDiagram";
 import FrasleLogo from "./components/FrasleLogo";
 import { Modal } from './components/ui/Modal';
 import { FormRow, FormField } from './components/FormComponents';
@@ -193,7 +193,7 @@ const App: React.FC = () => {
           </div>
 
           <FormRow>
-            <div className="flex-1 p-1 border-r border-gray-400 flex items-center space-x-4">
+            <div className="flex-2 p-1 border-r border-gray-400 flex items-center space-x-4">
               <span className="font-bold">Classificação prévia:</span>
               <label className="flex items-center">
                 <input
