@@ -1,0 +1,31 @@
+/* Copie todo seu CSS @media print para dentro dessa classe */
+.force-print * {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.force-print {
+  background: white !important;
+}
+
+@media print {
+  /* Esconde botões no CTRL+P normal */
+  .no-print {
+    display: none !important;
+  }
+}
+
+.force-print #export-area {
+  width: 794px !important;   /* A4 width */
+  padding: 10mm !important;
+  transform: none !important;
+}
+
+/* Este CSS deve ser adicionado para funcionar com o seu Tailwind/App.tsx */
+.force-print-capture {
+    background-color: #fff !important;
+}
+
+.force-print-capture #export-area {
+    box-shadow: none !important; /* Remove sombras grandes que podem aparecer cortadas na imagem */
+}
