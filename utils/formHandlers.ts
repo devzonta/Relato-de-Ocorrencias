@@ -111,8 +111,7 @@ export const createFormHandlers = (
             setor: funcionario.setor || prev.setor,
             gestor: funcionario.gestor || prev.gestor,
             coordenador: funcionario.coordenador || prev.coordenador,
-            turno: funcionario.turno || '',
-            escala: funcionario.escala || ''
+            turno: funcionario.turno || ''
           }));
 
           // Se o cargo começar com "Coordenador", alterar os labels
@@ -166,8 +165,7 @@ export const createFormHandlers = (
         setor: "",
         gestor: "",
         coordenador: "",
-        turno: "",
-        escala: ""
+        turno: ""
       }));
       if (setGestorLabel) setGestorLabel('Gestor');
       if (setCoordenadorLabel) setCoordenadorLabel('Coordenador');
@@ -268,27 +266,46 @@ export const createFormHandlers = (
       imagesContainer.style.setProperty('height', 'auto', 'important');
     }
 
-    // Pequeno atraso para garantir que o DOM renderize todas as mudanças e a formatação se expanda
-    await new Promise(r => setTimeout(r, 100));
+    // Atraso maior para garantir que o DOM renderize todas as mudanças
+    // e que o Chrome tenha tempo de processar recursos externos (fontes, SVGs)
+    await new Promise(r => setTimeout(r, 300));
+
+    const captureOptions: Parameters<typeof htmlToImage.toPng>[1] = {
+      quality: 1,
+      backgroundColor: "#ffffff",
+      width: exportArea.scrollWidth,
+      height: exportArea.scrollHeight,
+      pixelRatio: 2, /* Deixa a imagem final com muito mais definição */
+      // Evita capturar inputs hidden e elementos fora do fluxo visual
+      filter: (node: Node) => {
+        if (node instanceof HTMLElement) {
+          if (node.tagName === 'INPUT' && (node as HTMLInputElement).type === 'hidden') return false;
+        }
+        return true;
+      },
+      style: {
+        margin: '0', /* Previne os offsets gerados pelo "margin: 0 auto" */
+        alignItems: 'flex-start',
+        display: 'block',
+        left: '0',
+        top: '0'
+      }
+    };
 
     try {
-      // 2. Capturar com html-to-image
-      const dataURL = await htmlToImage.toPng(exportArea, {
-        quality: 1,
-        backgroundColor: "#ffffff",
-        width: exportArea.scrollWidth,
-        height: exportArea.scrollHeight,
-        pixelRatio: 2, /* Deixa a imagem final com muito mais definição */
-        style: {
-          margin: '0', /* Previne os offsets gerados pelo "margin: 0 auto" */
-          alignItems: 'flex-start',
-          display: 'block',
-          left: '0',
-          top: '0'
-        }
-      });
+      // 2. Primeira chamada: aquece o cache de recursos externos do Chrome
+      //    (fontes do CDN do Tailwind, SVGs inline, etc.)
+      //    O Chrome bloqueia recursos externos na primeira renderização;
+      //    na segunda, usa o cache e produz o resultado correto.
+      await htmlToImage.toPng(exportArea, captureOptions);
 
-      // 3. Baixar PNG diretamente
+      // Aguarda o cache ser populado antes da captura final
+      await new Promise(r => setTimeout(r, 200));
+
+      // 3. Segunda chamada: captura real com todos os recursos já em cache
+      const dataURL = await htmlToImage.toPng(exportArea, captureOptions);
+
+      // 4. Baixar PNG diretamente
       const link = document.createElement('a');
       link.href = dataURL;
       link.download = 'Relatorio de Ocorrencia.png';
@@ -335,7 +352,7 @@ export const createFormHandlers = (
 export const validateForm = (formData: FormState, selectedBodyParts: string[]): string | null => {
   const requiredFields = [
     'responsavelSSMA', 'data', 'hora', 'local', 'setor', 'gestor', 'coordenador',
-    'matricula', 'nome', 'funcao', 'turno', 'escala', 'descricao'
+    'matricula', 'nome', 'funcao', 'turno', 'descricao', 'tipoOcorrencia'
   ];
 
   for (const field of requiredFields) {
@@ -352,10 +369,9 @@ export const validateForm = (formData: FormState, selectedBodyParts: string[]): 
     return 'Pelo menos uma ação necessária com ação e responsável deve ser preenchida';
   }
 
-  const hasClassificacao = formData.classificacao.length > 0;
-  const isIncidente = formData.classificacao.includes('Incidente');
-  if (hasClassificacao && !isIncidente && selectedBodyParts.length === 0) {
-    return 'Quando uma classificação prévia é selecionada (exceto Incidente), pelo menos uma parte do corpo deve ser selecionada no diagrama';
+  const requiresBodyPart = formData.classificacao.some(c => c === 'ACPT' || c === 'ASPT' || c === 'Atendimento Ambulatorial');
+  if (requiresBodyPart && selectedBodyParts.length === 0) {
+    return 'Quando uma classificação prévia é selecionada (exceto CDM e QA), pelo menos uma parte do corpo deve ser selecionada no diagrama';
   }
 
   return null;
@@ -364,6 +380,9 @@ export const validateForm = (formData: FormState, selectedBodyParts: string[]): 
 export const generateReportText = (formData: FormState, selectedBodyParts: string[], images: File[]): string => {
   let report = `RELATO DE OCORRÊNCIA – FRASLE CAIXAS\n\n`;
 
+  if (formData.tipoOcorrencia) {
+    report += `Tipo de Ocorrência: ${formData.tipoOcorrencia}\n`;
+  }
   report += `Responsável SSMA: ${formData.responsavelSSMA}\n`;
   report += `Data: ${formData.data}\n`;
   report += `Hora: ${formData.hora}\n`;
@@ -379,8 +398,7 @@ export const generateReportText = (formData: FormState, selectedBodyParts: strin
   report += `Matrícula: ${formData.matricula}\n`;
   report += `Nome: ${formData.nome}\n`;
   report += `Função: ${formData.funcao}\n`;
-  report += `Turno: ${formData.turno}\n`;
-  report += `Escala: ${formData.escala}\n\n`;
+  report += `Turno: ${formData.turno}\n\n`;
 
   report += `DESCRIÇÃO DO EVENTO\n`;
   report += `${formData.descricao}\n\n`;

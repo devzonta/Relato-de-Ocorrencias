@@ -8,12 +8,12 @@ export interface FormState {
   setor: string;
   gestor: string;
   coordenador: string;
+  tipoOcorrencia: string;
   classificacao: string[];
   sif: boolean;
   psif: boolean;
   matricula: string;
   nome: string;
-  escala: string;
   turno: string;
   funcao: string;
   descricao: string;

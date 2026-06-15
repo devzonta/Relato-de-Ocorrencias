@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import BodyDiagram from "./components/BodyDiagram";
 import FrasleLogo from "./components/FrasleLogo";
-import { Modal } from './components/ui/Modal';
+import { Modal } from "./components/ui/Modal";
 import { importFromExcel } from "./database";
-import { FormState } from './types';
-import { FormRow, FormField } from './components/FormComponents';
-import { createResponsavelSSMAHandlers, createLocalHandlers, createSetorHandlers, createGestorHandlers, createCoordenadorHandlers } from './utils/autocompleteHandlers';
-import { createFormHandlers } from './utils/formHandlers';
-import { refreshConstants } from './utils/constants';
+import { FormState } from "./types";
+import { FormRow, FormField } from "./components/FormComponents";
+import {
+  createResponsavelSSMAHandlers,
+  createLocalHandlers,
+  createSetorHandlers,
+  createGestorHandlers,
+  createCoordenadorHandlers,
+} from "./utils/autocompleteHandlers";
+import { createFormHandlers } from "./utils/formHandlers";
+import { refreshConstants } from "./utils/constants";
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -21,12 +27,12 @@ const App: React.FC = () => {
     setor: "",
     gestor: "",
     coordenador: "",
+    tipoOcorrencia: "",
     classificacao: [],
     sif: false,
     psif: false,
     matricula: "",
     nome: "",
-    escala: "",
     turno: "",
     funcao: "",
     descricao: "",
@@ -50,39 +56,52 @@ const App: React.FC = () => {
   const [filteredGestorNames, setFilteredGestorNames] = useState<string[]>([]);
   const [highlightedGestorIndex, setHighlightedGestorIndex] = useState(-1);
 
-  const [showCoordenadorAutocomplete, setShowCoordenadorAutocomplete] = useState(false);
-  const [filteredCoordenadorNames, setFilteredCoordenadorNames] = useState<string[]>([]);
-  const [highlightedCoordenadorIndex, setHighlightedCoordenadorIndex] = useState(-1);
+  const [showCoordenadorAutocomplete, setShowCoordenadorAutocomplete] =
+    useState(false);
+  const [filteredCoordenadorNames, setFilteredCoordenadorNames] = useState<
+    string[]
+  >([]);
+  const [highlightedCoordenadorIndex, setHighlightedCoordenadorIndex] =
+    useState(-1);
 
   // Estado para controlar se os campos estão preenchidos automaticamente
   const [isAutoFilled, setIsAutoFilled] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
-  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
   const [modal, setModal] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    type: 'error' | 'warning' | 'info';
+    type: "error" | "warning" | "info";
   }>({
     isOpen: false,
-    title: '',
-    message: '',
-    type: 'info'
+    title: "",
+    message: "",
+    type: "info",
   });
 
   // Labels dinâmicos para Gestor e Coordenador
-  const [gestorLabel, setGestorLabel] = useState('Gestor');
-  const [coordenadorLabel, setCoordenadorLabel] = useState('Coordenador');
+  const [gestorLabel, setGestorLabel] = useState("Gestor");
+  const [coordenadorLabel, setCoordenadorLabel] = useState("Coordenador");
 
   // Handler para importação de excel manual
   const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       if (file.name !== "LISTA_PESSOAS.xlsx") {
-        setModal({ isOpen: true, title: "Arquivo Inválido", message: "Por favor, selecione a planilha correta nomeada exatamente como 'LISTA_PESSOAS.xlsx'.", type: "error" });
+        setModal({
+          isOpen: true,
+          title: "Arquivo Inválido",
+          message:
+            "Por favor, selecione a planilha correta nomeada exatamente como 'LISTA_PESSOAS.xlsx'.",
+          type: "error",
+        });
         e.target.value = "";
         return;
       }
@@ -91,44 +110,79 @@ const App: React.FC = () => {
         if (showNotification) showNotification("Importando dados...", "info");
         const count = await importFromExcel(file);
         await refreshConstants();
-        if (showNotification) showNotification(`Sucesso! ${count} cadastros lidos e formatados.`, "success");
+        if (showNotification)
+          showNotification(
+            `Sucesso! ${count} cadastros lidos e formatados.`,
+            "success",
+          );
       } catch (err) {
-        setModal({ isOpen: true, title: "Erro na importação", message: "Verifique se a planilha tem a aba padrão estruturada corretamente.", type: "error" });
+        setModal({
+          isOpen: true,
+          title: "Erro na importação",
+          message:
+            "Verifique se a planilha tem a aba padrão estruturada corretamente.",
+          type: "error",
+        });
       }
       e.target.value = "";
     }
   };
 
   // Criar handlers
-  const { handleResponsavelSSMAChange, handleAutocompleteSelect, handleKeyDown, handleBlur } = createResponsavelSSMAHandlers({
+  const {
+    handleResponsavelSSMAChange,
+    handleAutocompleteSelect,
+    handleKeyDown,
+    handleBlur,
+  } = createResponsavelSSMAHandlers({
     setFormData,
     setShowAutocomplete,
     setFilteredNames,
     setHighlightedIndex,
   });
 
-  const { handleLocalChange, handleLocalSelect, handleLocalKeyDown, handleLocalBlur } = createLocalHandlers({
+  const {
+    handleLocalChange,
+    handleLocalSelect,
+    handleLocalKeyDown,
+    handleLocalBlur,
+  } = createLocalHandlers({
     setFormData,
     setShowLocalAutocomplete,
     setFilteredLocalNames,
     setHighlightedLocalIndex,
   });
 
-  const { handleSetorChange, handleSetorSelect, handleSetorKeyDown, handleSetorBlur } = createSetorHandlers({
+  const {
+    handleSetorChange,
+    handleSetorSelect,
+    handleSetorKeyDown,
+    handleSetorBlur,
+  } = createSetorHandlers({
     setFormData,
     setShowSetorAutocomplete,
     setFilteredSetorNames,
     setHighlightedSetorIndex,
   });
 
-  const { handleGestorChange, handleGestorSelect, handleGestorKeyDown, handleGestorBlur } = createGestorHandlers({
+  const {
+    handleGestorChange,
+    handleGestorSelect,
+    handleGestorKeyDown,
+    handleGestorBlur,
+  } = createGestorHandlers({
     setFormData,
     setShowGestorAutocomplete,
     setFilteredGestorNames,
     setHighlightedGestorIndex,
   });
 
-  const { handleCoordenadorChange, handleCoordenadorSelect, handleCoordenadorKeyDown, handleCoordenadorBlur } = createCoordenadorHandlers({
+  const {
+    handleCoordenadorChange,
+    handleCoordenadorSelect,
+    handleCoordenadorKeyDown,
+    handleCoordenadorBlur,
+  } = createCoordenadorHandlers({
     setFormData,
     setShowCoordenadorAutocomplete,
     setFilteredCoordenadorNames,
@@ -152,18 +206,30 @@ const App: React.FC = () => {
     removeImage,
     showNotification,
     handleCopy,
-  } = createFormHandlers(setFormData, setIsAutoFilled, setImages, setIsDragOver, setNotification, setModal, setGestorLabel, setCoordenadorLabel);
-
-
+  } = createFormHandlers(
+    setFormData,
+    setIsAutoFilled,
+    setImages,
+    setIsDragOver,
+    setNotification,
+    setModal,
+    setGestorLabel,
+    setCoordenadorLabel,
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       {/* Notification */}
       {notification && (
-        <div className={`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white max-w-xs ${
-          notification.type === 'success' ? 'bg-green-500' :
-          notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-        }`}>
+        <div
+          className={`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white max-w-xs ${
+            notification.type === "success"
+              ? "bg-green-500"
+              : notification.type === "error"
+                ? "bg-red-500"
+                : "bg-blue-500"
+          }`}
+        >
           {notification.message}
         </div>
       )}
@@ -171,7 +237,7 @@ const App: React.FC = () => {
       {/* Modal */}
       <Modal
         isOpen={modal.isOpen}
-        onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => setModal((prev) => ({ ...prev, isOpen: false }))}
         title={modal.title}
         message={modal.message}
         type={modal.type}
@@ -184,14 +250,28 @@ const App: React.FC = () => {
           title="Importar Planilha (LISTA_PESSOAS.xlsx)"
         >
           <span>📁</span>
-          <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleExcelImport} />
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            className="hidden"
+            onChange={handleExcelImport}
+          />
         </label>
         <button
           onClick={() => handleCopy(formData, selectedBodyParts, images)}
           className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
           title="Gerar Imagem PNG"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <circle cx="9" cy="9" r="2"></circle>
             <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
@@ -201,17 +281,19 @@ const App: React.FC = () => {
 
       <div
         id="export-area"
-        style={{ width: "1000px", margin: "0 auto" }}
+        style={{ width: "1070px", margin: "0 auto" }}
         className="bg-white shadow-lg border-2 border-black"
       >
         {/* Header */}
-        <header className="relative flex items-center py-4 px-2 border-b-2 border-black text-white" style={{ backgroundColor: '#3F3F3F' }}>
+        <header
+          className="relative flex items-center py-4 px-2 border-b-2 border-black text-white"
+          style={{ backgroundColor: "#3F3F3F" }}
+        >
           <FrasleLogo />
           <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl md:text-2xl font-bold">
             Relato De Ocorrência – Frasle Caxias
           </h1>
         </header>
-
 
         {/* Main Form Body */}
         <div className="text-sm">
@@ -239,7 +321,7 @@ const App: React.FC = () => {
                         <li
                           key={name}
                           className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
-                            index === highlightedIndex ? 'bg-blue-200' : ''
+                            index === highlightedIndex ? "bg-blue-200" : ""
                           }`}
                           onClick={() => handleAutocompleteSelect(name)}
                           onMouseEnter={() => setHighlightedIndex(index)}
@@ -276,109 +358,212 @@ const App: React.FC = () => {
             </div>
           </FormRow>
 
-
+          {/* ── Seção: Tipo de Ocorrência ─────────────────────────── */}
           <div className="bg-gray-500 p-1 font-bold border-b border-gray-400 text-center text-white">
-            Identificação do Envolvido
+            Tipo de Ocorrência
           </div>
 
           <FormRow>
-            <div className="flex-3 p-1 border-r border-gray-400 flex items-center space-x-4">
-              <span className="font-bold">Classificação prévia:</span>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.classificacao.includes("ACPT")}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      classificacao: e.target.checked ? ["ACPT"] : [],
-                    }))
-                  }
-                  className="mr-1"
-                />{" "}
-                ACPT
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.classificacao.includes("ASPT")}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      classificacao: e.target.checked ? ["ASPT"] : [],
-                    }))
-                  }
-                  className="mr-1"
-                />{" "}
-                ASPT
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.classificacao.includes("Incidente")}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      classificacao: e.target.checked ? ["Incidente"] : [],
-                    }))
-                  }
-                  className="mr-1"
-                />{" "}
-                INCIDENTE
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.classificacao.includes(
-                    "Atendimento Ambulatorial"
-                  )}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      classificacao: e.target.checked
-                        ? ["Atendimento Ambulatorial"]
-                        : [],
-                    }))
-                  }
-                  className="mr-1"
-                />{" "}
-                ATENDIMENTO AMBULATORIAL
-              </label>
-            </div>
             <div className="flex-1 p-1 flex items-center space-x-4">
-              <span className="font-bold mr-2">Classificação previa potencial:</span>
-              <label className="flex items-center">
+              <span className="font-bold">Área:</span>
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={formData.sif}
+                  checked={formData.tipoOcorrencia === "Meio Ambiente"}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      sif: e.target.checked,
+                      tipoOcorrencia: e.target.checked ? "Meio Ambiente" : "",
+                      classificacao: [],
+                      sif: false,
                       psif: false,
                     }))
                   }
-                  className="mr-1"
-                />{" "}
-                SIF
+                  className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                />
+                <span>MEIO AMBIENTE</span>
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={formData.psif}
+                  checked={formData.tipoOcorrencia === "Segurança do Trabalho"}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      psif: e.target.checked,
+                      tipoOcorrencia: e.target.checked
+                        ? "Segurança do Trabalho"
+                        : "",
+                      classificacao: [],
                       sif: false,
+                      psif: false,
                     }))
                   }
-                  className="mr-1"
-                />{" "}
-                PSIF
+                  className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                />
+                <span>SEGURANÇA DO TRABALHO</span>
               </label>
             </div>
           </FormRow>
+
+          {/* ── Seção: Classificação ───────────────────────────────── */}
+          {formData.tipoOcorrencia && (
+            <>
+              <div className="bg-gray-500 p-1 font-bold border-b border-gray-400 text-center text-white">
+                Classificação
+              </div>
+
+              <FormRow>
+                <div className="flex-1 p-1 flex items-center space-x-4">
+                  <span className="font-bold">Categoria da Ocorrência:</span>
+
+                  {formData.tipoOcorrencia === "Meio Ambiente" && (
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.classificacao.includes(
+                          "Incidente Ambiental",
+                        )}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            classificacao: e.target.checked
+                              ? ["Incidente Ambiental"]
+                              : [],
+                          }))
+                        }
+                        className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                      />
+                      <span>INCIDENTE AMBIENTAL</span>
+                    </label>
+                  )}
+
+                  {formData.tipoOcorrencia === "Segurança do Trabalho" && (
+                    <>
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.classificacao.includes("ACPT")}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              classificacao: e.target.checked ? ["ACPT"] : [],
+                            }))
+                          }
+                          className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                        />
+                        <span>ACPT</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.classificacao.includes("ASPT")}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              classificacao: e.target.checked ? ["ASPT"] : [],
+                            }))
+                          }
+                          className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                        />
+                        <span>ASPT</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.classificacao.includes(
+                            "Atendimento Ambulatorial",
+                          )}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              classificacao: e.target.checked
+                                ? ["Atendimento Ambulatorial"]
+                                : [],
+                            }))
+                          }
+                          className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                        />
+                        <span>ATENDIMENTO AMBULATORIAL</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.classificacao.includes("CDM")}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              classificacao: e.target.checked ? ["CDM"] : [],
+                            }))
+                          }
+                          className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                        />
+                        <span>CDM (ACIDENTE COM DANOS MATERIAIS)</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.classificacao.includes("QA")}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              classificacao: e.target.checked ? ["QA"] : [],
+                            }))
+                          }
+                          className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                        />
+                        <span>QA (QUASE ACIDENTE)</span>
+                      </label>
+                    </>
+                  )}
+                </div>
+              </FormRow>
+
+              {formData.tipoOcorrencia === "Segurança do Trabalho" && (
+                <FormRow>
+                  <div className="flex-1 p-1 flex items-center space-x-4">
+                    <span className="font-bold mr-2">
+                      Potencial de Severidade:
+                    </span>
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.sif}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            sif: e.target.checked,
+                            psif: false,
+                          }))
+                        }
+                        className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                      />
+                      <span>SIF</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.psif}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            psif: e.target.checked,
+                            sif: false,
+                          }))
+                        }
+                        className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
+                      />
+                      <span>PSIF</span>
+                    </label>
+                  </div>
+                </FormRow>
+              )}
+            </>
+          )}
+
+          {/* ── Seção: Identificação do Envolvido ─────────────────── */}
+          <div className="bg-gray-500 p-1 font-bold border-b border-gray-400 text-center text-white">
+            Identificação do Envolvido
+          </div>
 
           <FormRow>
             <div className="w-64 p-1 border-r border-gray-400 flex items-center">
@@ -412,10 +597,13 @@ const App: React.FC = () => {
               onChange={handleInputChange}
             />
             <div className="ml-auto flex">
-              <div className="flex-1 min-w-24 p-1 flex items-center border-r border-gray-400">
+              <div className="flex-1 min-w-24 p-1 flex items-center">
                 <span className="font-bold mr-2 whitespace-nowrap">Turno:</span>
                 {[1, 2, 3, 4].map((num) => (
-                  <label key={num} className="flex items-center mr-2">
+                  <label
+                    key={num}
+                    className="flex items-center gap-1.5 mr-2 cursor-pointer select-none"
+                  >
                     <input
                       type="checkbox"
                       name="turno"
@@ -426,44 +614,11 @@ const App: React.FC = () => {
                           turno: e.target.checked ? num.toString() : "",
                         }))
                       }
-                      className="mr-1"
+                      className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
                     />
-                    {num}
+                    <span>{num}</span>
                   </label>
                 ))}
-              </div>
-              <div className="flex-1 min-w-48 p-1 flex items-center border-r border-gray-400">
-                <span className="font-bold mr-2 whitespace-nowrap">Escala:</span>
-                <label className="flex items-center mr-2">
-                  <input
-                    type="checkbox"
-                    name="Escala"
-                    checked={formData.escala === "Sim"}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        escala: e.target.checked ? "Sim" : "",
-                      }))
-                    }
-                    className="mr-1"
-                  />{" "}
-                  Sim
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="Escala"
-                    checked={formData.escala === "Não"}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        escala: e.target.checked ? "Não" : "",
-                      }))
-                    }
-                    className="mr-1"
-                  />{" "}
-                  Não
-                </label>
               </div>
             </div>
           </FormRow>
@@ -471,7 +626,9 @@ const App: React.FC = () => {
           <FormRow>
             <div className="w-72 border-r border-gray-400 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">Local:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">
+                  Local:
+                </label>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -489,7 +646,7 @@ const App: React.FC = () => {
                         <li
                           key={name}
                           className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
-                            index === highlightedLocalIndex ? 'bg-blue-200' : ''
+                            index === highlightedLocalIndex ? "bg-blue-200" : ""
                           }`}
                           onClick={() => handleLocalSelect(name)}
                           onMouseEnter={() => setHighlightedLocalIndex(index)}
@@ -504,7 +661,9 @@ const App: React.FC = () => {
             </div>
             <div className="flex-1 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">Setor:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">
+                  Setor:
+                </label>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -522,7 +681,7 @@ const App: React.FC = () => {
                         <li
                           key={name}
                           className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
-                            index === highlightedSetorIndex ? 'bg-blue-200' : ''
+                            index === highlightedSetorIndex ? "bg-blue-200" : ""
                           }`}
                           onClick={() => handleSetorSelect(name)}
                           onMouseEnter={() => setHighlightedSetorIndex(index)}
@@ -540,7 +699,9 @@ const App: React.FC = () => {
           <FormRow>
             <div className="flex-1 border-r border-gray-400 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">{gestorLabel}:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">
+                  {gestorLabel}:
+                </label>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -558,7 +719,9 @@ const App: React.FC = () => {
                         <li
                           key={name}
                           className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
-                            index === highlightedGestorIndex ? 'bg-blue-200' : ''
+                            index === highlightedGestorIndex
+                              ? "bg-blue-200"
+                              : ""
                           }`}
                           onClick={() => handleGestorSelect(name)}
                           onMouseEnter={() => setHighlightedGestorIndex(index)}
@@ -573,7 +736,9 @@ const App: React.FC = () => {
             </div>
             <div className="flex-1 p-1">
               <div className="flex items-center h-full relative">
-                <label className="font-bold mr-2 whitespace-nowrap">{coordenadorLabel}:</label>
+                <label className="font-bold mr-2 whitespace-nowrap">
+                  {coordenadorLabel}:
+                </label>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -585,22 +750,27 @@ const App: React.FC = () => {
                     className="w-full bg-transparent focus:outline-none uppercase"
                     autoComplete="off"
                   />
-                  {showCoordenadorAutocomplete && filteredCoordenadorNames.length > 0 && (
-                    <ul className="absolute z-50 w-full bg-white border border-gray-300 shadow-lg mt-1 max-h-48 overflow-y-auto">
-                      {filteredCoordenadorNames.map((name, index) => (
-                        <li
-                          key={name}
-                          className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
-                            index === highlightedCoordenadorIndex ? 'bg-blue-200' : ''
-                          }`}
-                          onClick={() => handleCoordenadorSelect(name)}
-                          onMouseEnter={() => setHighlightedCoordenadorIndex(index)}
-                        >
-                          {name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  {showCoordenadorAutocomplete &&
+                    filteredCoordenadorNames.length > 0 && (
+                      <ul className="absolute z-50 w-full bg-white border border-gray-300 shadow-lg mt-1 max-h-48 overflow-y-auto">
+                        {filteredCoordenadorNames.map((name, index) => (
+                          <li
+                            key={name}
+                            className={`px-3 py-2 cursor-pointer hover:bg-blue-100 ${
+                              index === highlightedCoordenadorIndex
+                                ? "bg-blue-200"
+                                : ""
+                            }`}
+                            onClick={() => handleCoordenadorSelect(name)}
+                            onMouseEnter={() =>
+                              setHighlightedCoordenadorIndex(index)
+                            }
+                          >
+                            {name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                 </div>
               </div>
             </div>
@@ -634,7 +804,7 @@ const App: React.FC = () => {
               Fotos
             </div>
             <div
-              className={`border-b border-gray-400 p-2 flex flex-col items-center justify-center ${isDragOver ? 'border-dashed border-2 border-blue-500' : ''} ${images.length > 0 ? 'h-auto' : 'h-48'}`}
+              className={`border-b border-gray-400 p-2 flex flex-col items-center justify-center ${isDragOver ? "border-dashed border-2 border-blue-500" : ""} ${images.length > 0 ? "h-auto" : "h-48"}`}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -643,21 +813,29 @@ const App: React.FC = () => {
                 <div className="w-full flex justify-center">
                   <div
                     className="border-2 border-dashed border-gray-400 rounded p-4 cursor-pointer text-center text-gray-600 hover:border-gray-600 text-sm"
-                    onClick={() => document.getElementById('file-input')?.click()}
+                    onClick={() =>
+                      document.getElementById("file-input")?.click()
+                    }
                   >
                     Clique para adicionar imagens <br />
                     ou arraste e solte aqui
                   </div>
                 </div>
               ) : (
-                <div className={`w-full h-full overflow-y-auto ${images.length === 1 ? 'flex justify-center' : 'grid grid-cols-2 gap-2'}`}>
+                <div
+                  className={`w-full h-full overflow-y-auto ${images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-2"}`}
+                >
                   {images.slice(0, 4).map((image, index) => (
-                    <div key={index} className="relative group" style={{ maxWidth: '100%', maxHeight: '400px' }}>
+                    <div
+                      key={index}
+                      className="relative group"
+                      style={{ maxWidth: "100%", maxHeight: "400px" }}
+                    >
                       <img
                         src={URL.createObjectURL(image)}
                         alt={`Imagem ${index + 1}`}
                         className="w-full h-full object-contain"
-                        style={{ maxWidth: '100%', maxHeight: '400px' }}
+                        style={{ maxWidth: "100%", maxHeight: "400px" }}
                       />
                       <button
                         type="button"
@@ -665,7 +843,16 @@ const App: React.FC = () => {
                         className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Remover imagem"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <path d="M3 6h18"></path>
                           <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                           <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -714,7 +901,11 @@ const App: React.FC = () => {
                     }}
                     onKeyPress={(e) => handleAcoesImediatasKeyPress(index, e)}
                     className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-sm uppercase"
-                    style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
+                    style={{
+                      height: "auto",
+                      minHeight: "1.5rem",
+                      whiteSpace: "pre-wrap",
+                    }}
                     rows={1}
                     placeholder={
                       isLastField && acao === ""
@@ -729,7 +920,16 @@ const App: React.FC = () => {
                       className="absolute top-1 -right-8 text-gray-700 hover:text-gray-900"
                       title="Remover ação"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -792,7 +992,11 @@ const App: React.FC = () => {
                           : ""
                       }
                       className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-sm uppercase"
-                      style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
+                      style={{
+                        height: "auto",
+                        minHeight: "1.5rem",
+                        whiteSpace: "pre-wrap",
+                      }}
                       rows={1}
                     />
                   </div>
@@ -819,7 +1023,11 @@ const App: React.FC = () => {
                         handleAcoesNecessariasKeyPress(index, e)
                       }
                       className="w-full p-1 focus:outline-none bg-transparent whitespace-pre-wrap break-words resize-none text-center text-sm uppercase"
-                      style={{ height: "auto", minHeight: "1.5rem", whiteSpace: 'pre-wrap' }}
+                      style={{
+                        height: "auto",
+                        minHeight: "1.5rem",
+                        whiteSpace: "pre-wrap",
+                      }}
                       rows={1}
                     />
                   </div>
@@ -845,7 +1053,16 @@ const App: React.FC = () => {
                       className="absolute top-1 -right-8 text-gray-700 hover:text-gray-900"
                       title="Remover ação"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
