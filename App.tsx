@@ -497,7 +497,7 @@ const App: React.FC = () => {
                           }
                           className="w-4 h-4 cursor-pointer accent-blue-600 m-0"
                         />
-                        <span>CDM (ACIDENTE COM DANOS MATERIAIS)</span>
+                        <span>CDM (OCORRÊNCIA COM DANOS MATERIAIS)</span>
                       </label>
                       <label className="flex items-center gap-1.5 cursor-pointer select-none">
                         <input
