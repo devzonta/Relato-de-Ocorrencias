@@ -409,7 +409,7 @@ const App: React.FC = () => {
           {formData.tipoOcorrencia && (
             <>
               <div className="bg-gray-500 p-1 font-bold border-b border-gray-400 text-center text-white">
-                Classificação
+                Classificação Prévia
               </div>
 
               <FormRow>
