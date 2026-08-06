@@ -944,7 +944,7 @@ const App: React.FC = () => {
           <div>
             <div className="flex border-b-2 border-black">
               <div className="flex-1 min-w-88 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
-                Ações Necessárias
+                Ações Corretivas
               </div>
               <div className="w-72 bg-gray-500 p-1 font-bold border-r border-gray-400 text-center text-white">
                 Responsável
