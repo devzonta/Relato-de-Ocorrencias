@@ -30,3 +30,10 @@ dist-ssr
 !package-lock.json
 !tsconfig.json
 !SSMA.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
