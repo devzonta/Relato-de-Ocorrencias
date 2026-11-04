@@ -2,8 +2,47 @@ import React from 'react';
 import { FormState, AutocompleteSetters, LocalAutocompleteSetters, SetorAutocompleteSetters, GestorAutocompleteSetters, CoordenadorAutocompleteSetters } from '../types';
 import { ssmaNames, localNames, setorNames, gestorNames, coordenadorNames } from './constants';
 
+const createAutocompleteKeyDownHandler = ({
+  isOpen,
+  options,
+  highlightedIndex,
+  setIsOpen,
+  setHighlightedIndex,
+  onSelect,
+}: {
+  isOpen: boolean;
+  options: string[];
+  highlightedIndex: number;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>;
+  onSelect: (option: string) => void;
+}) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (!isOpen || options.length === 0) return;
+
+  switch (e.key) {
+    case "ArrowDown":
+      e.preventDefault();
+      setHighlightedIndex(highlightedIndex < options.length - 1 ? highlightedIndex + 1 : 0);
+      break;
+    case "ArrowUp":
+      e.preventDefault();
+      setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : options.length - 1);
+      break;
+    case "Enter":
+      e.preventDefault();
+      if (highlightedIndex >= 0 && options[highlightedIndex]) {
+        onSelect(options[highlightedIndex]);
+      }
+      break;
+    case "Escape":
+      setIsOpen(false);
+      setHighlightedIndex(-1);
+      break;
+  }
+};
+
 export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
-  const { setFormData, setShowAutocomplete, setFilteredNames, setHighlightedIndex } = setters;
+  const { setFormData, showAutocomplete, filteredNames, highlightedIndex, setShowAutocomplete, setFilteredNames, setHighlightedIndex } = setters;
 
   const handleResponsavelSSMAChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -29,34 +68,14 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
     setHighlightedIndex(-1);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!setters.setShowAutocomplete || setters.setFilteredNames.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < setters.setFilteredNames.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev > 0 ? prev - 1 : setters.setFilteredNames.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (setters.setHighlightedIndex >= 0) {
-          handleAutocompleteSelect(setters.setFilteredNames[setters.setHighlightedIndex]);
-        }
-        break;
-      case "Escape":
-        setters.setShowAutocomplete(false);
-        setHighlightedIndex(-1);
-        break;
-    }
-  };
+  const handleKeyDown = createAutocompleteKeyDownHandler({
+    isOpen: showAutocomplete,
+    options: filteredNames,
+    highlightedIndex,
+    setIsOpen: setShowAutocomplete,
+    setHighlightedIndex,
+    onSelect: handleAutocompleteSelect,
+  });
 
   const handleBlur = () => {
     setTimeout(() => {
@@ -69,7 +88,7 @@ export const createResponsavelSSMAHandlers = (setters: AutocompleteSetters) => {
 };
 
 export const createLocalHandlers = (setters: LocalAutocompleteSetters) => {
-  const { setFormData, setShowLocalAutocomplete, setFilteredLocalNames, setHighlightedLocalIndex } = setters;
+  const { setFormData, showLocalAutocomplete, filteredLocalNames, highlightedLocalIndex, setShowLocalAutocomplete, setFilteredLocalNames, setHighlightedLocalIndex } = setters;
 
   const handleLocalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -95,34 +114,14 @@ export const createLocalHandlers = (setters: LocalAutocompleteSetters) => {
     setHighlightedLocalIndex(-1);
   };
 
-  const handleLocalKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!setShowLocalAutocomplete || setters.setFilteredLocalNames.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedLocalIndex((prev) =>
-          prev < setters.setFilteredLocalNames.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedLocalIndex((prev) =>
-          prev > 0 ? prev - 1 : setters.setFilteredLocalNames.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (setters.setHighlightedLocalIndex >= 0) {
-          handleLocalSelect(setters.setFilteredLocalNames[setters.setHighlightedLocalIndex]);
-        }
-        break;
-      case "Escape":
-        setShowLocalAutocomplete(false);
-        setHighlightedLocalIndex(-1);
-        break;
-    }
-  };
+  const handleLocalKeyDown = createAutocompleteKeyDownHandler({
+    isOpen: showLocalAutocomplete,
+    options: filteredLocalNames,
+    highlightedIndex: highlightedLocalIndex,
+    setIsOpen: setShowLocalAutocomplete,
+    setHighlightedIndex: setHighlightedLocalIndex,
+    onSelect: handleLocalSelect,
+  });
 
   const handleLocalBlur = () => {
     setTimeout(() => {
@@ -136,7 +135,7 @@ export const createLocalHandlers = (setters: LocalAutocompleteSetters) => {
 
 // Similar para setor, gestor, coordenador
 export const createSetorHandlers = (setters: SetorAutocompleteSetters) => {
-  const { setFormData, setShowSetorAutocomplete, setFilteredSetorNames, setHighlightedSetorIndex } = setters;
+  const { setFormData, showSetorAutocomplete, filteredSetorNames, highlightedSetorIndex, setShowSetorAutocomplete, setFilteredSetorNames, setHighlightedSetorIndex } = setters;
 
   const handleSetorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -162,34 +161,14 @@ export const createSetorHandlers = (setters: SetorAutocompleteSetters) => {
     setHighlightedSetorIndex(-1);
   };
 
-  const handleSetorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!setShowSetorAutocomplete || setters.setFilteredSetorNames.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedSetorIndex((prev) =>
-          prev < setters.setFilteredSetorNames.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedSetorIndex((prev) =>
-          prev > 0 ? prev - 1 : setters.setFilteredSetorNames.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (setters.setHighlightedSetorIndex >= 0) {
-          handleSetorSelect(setters.setFilteredSetorNames[setters.setHighlightedSetorIndex]);
-        }
-        break;
-      case "Escape":
-        setShowSetorAutocomplete(false);
-        setHighlightedSetorIndex(-1);
-        break;
-    }
-  };
+  const handleSetorKeyDown = createAutocompleteKeyDownHandler({
+    isOpen: showSetorAutocomplete,
+    options: filteredSetorNames,
+    highlightedIndex: highlightedSetorIndex,
+    setIsOpen: setShowSetorAutocomplete,
+    setHighlightedIndex: setHighlightedSetorIndex,
+    onSelect: handleSetorSelect,
+  });
 
   const handleSetorBlur = () => {
     setTimeout(() => {
@@ -202,7 +181,7 @@ export const createSetorHandlers = (setters: SetorAutocompleteSetters) => {
 };
 
 export const createGestorHandlers = (setters: GestorAutocompleteSetters) => {
-  const { setFormData, setShowGestorAutocomplete, setFilteredGestorNames, setHighlightedGestorIndex } = setters;
+  const { setFormData, showGestorAutocomplete, filteredGestorNames, highlightedGestorIndex, setShowGestorAutocomplete, setFilteredGestorNames, setHighlightedGestorIndex } = setters;
 
   const handleGestorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -228,34 +207,14 @@ export const createGestorHandlers = (setters: GestorAutocompleteSetters) => {
     setHighlightedGestorIndex(-1);
   };
 
-  const handleGestorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!setShowGestorAutocomplete || setters.setFilteredGestorNames.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedGestorIndex((prev) =>
-          prev < setters.setFilteredGestorNames.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedGestorIndex((prev) =>
-          prev > 0 ? prev - 1 : setters.setFilteredGestorNames.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (setters.setHighlightedGestorIndex >= 0) {
-          handleGestorSelect(setters.setFilteredGestorNames[setters.setHighlightedGestorIndex]);
-        }
-        break;
-      case "Escape":
-        setShowGestorAutocomplete(false);
-        setHighlightedGestorIndex(-1);
-        break;
-    }
-  };
+  const handleGestorKeyDown = createAutocompleteKeyDownHandler({
+    isOpen: showGestorAutocomplete,
+    options: filteredGestorNames,
+    highlightedIndex: highlightedGestorIndex,
+    setIsOpen: setShowGestorAutocomplete,
+    setHighlightedIndex: setHighlightedGestorIndex,
+    onSelect: handleGestorSelect,
+  });
 
   const handleGestorBlur = () => {
     setTimeout(() => {
@@ -268,7 +227,7 @@ export const createGestorHandlers = (setters: GestorAutocompleteSetters) => {
 };
 
 export const createCoordenadorHandlers = (setters: CoordenadorAutocompleteSetters) => {
-  const { setFormData, setShowCoordenadorAutocomplete, setFilteredCoordenadorNames, setHighlightedCoordenadorIndex } = setters;
+  const { setFormData, showCoordenadorAutocomplete, filteredCoordenadorNames, highlightedCoordenadorIndex, setShowCoordenadorAutocomplete, setFilteredCoordenadorNames, setHighlightedCoordenadorIndex } = setters;
 
   const handleCoordenadorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -294,34 +253,14 @@ export const createCoordenadorHandlers = (setters: CoordenadorAutocompleteSetter
     setHighlightedCoordenadorIndex(-1);
   };
 
-  const handleCoordenadorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!setShowCoordenadorAutocomplete || setters.setFilteredCoordenadorNames.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedCoordenadorIndex((prev) =>
-          prev < setters.setFilteredCoordenadorNames.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedCoordenadorIndex((prev) =>
-          prev > 0 ? prev - 1 : setters.setFilteredCoordenadorNames.length - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (setters.setHighlightedCoordenadorIndex >= 0) {
-          handleCoordenadorSelect(setters.setFilteredCoordenadorNames[setters.setHighlightedCoordenadorIndex]);
-        }
-        break;
-      case "Escape":
-        setShowCoordenadorAutocomplete(false);
-        setHighlightedCoordenadorIndex(-1);
-        break;
-    }
-  };
+  const handleCoordenadorKeyDown = createAutocompleteKeyDownHandler({
+    isOpen: showCoordenadorAutocomplete,
+    options: filteredCoordenadorNames,
+    highlightedIndex: highlightedCoordenadorIndex,
+    setIsOpen: setShowCoordenadorAutocomplete,
+    setHighlightedIndex: setHighlightedCoordenadorIndex,
+    onSelect: handleCoordenadorSelect,
+  });
 
   const handleCoordenadorBlur = () => {
     setTimeout(() => {

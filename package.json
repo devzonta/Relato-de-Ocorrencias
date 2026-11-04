@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "copy-image-clipboard": "^2.1.2",
+    "dexie": "^4.4.7",
     "file-saver": "^2.0.5",
     "html-to-image": "^1.11.13",
     "jspdf": "^3.0.4",

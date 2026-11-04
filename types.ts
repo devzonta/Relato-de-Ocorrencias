@@ -35,6 +35,9 @@ export interface FormFieldProps {
 
 export interface AutocompleteSetters {
   setFormData: React.Dispatch<React.SetStateAction<FormState>>;
+  showAutocomplete: boolean;
+  filteredNames: string[];
+  highlightedIndex: number;
   setShowAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
   setFilteredNames: React.Dispatch<React.SetStateAction<string[]>>;
   setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -42,6 +45,9 @@ export interface AutocompleteSetters {
 
 export interface LocalAutocompleteSetters {
   setFormData: React.Dispatch<React.SetStateAction<FormState>>;
+  showLocalAutocomplete: boolean;
+  filteredLocalNames: string[];
+  highlightedLocalIndex: number;
   setShowLocalAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
   setFilteredLocalNames: React.Dispatch<React.SetStateAction<string[]>>;
   setHighlightedLocalIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -49,6 +55,9 @@ export interface LocalAutocompleteSetters {
 
 export interface SetorAutocompleteSetters {
   setFormData: React.Dispatch<React.SetStateAction<FormState>>;
+  showSetorAutocomplete: boolean;
+  filteredSetorNames: string[];
+  highlightedSetorIndex: number;
   setShowSetorAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
   setFilteredSetorNames: React.Dispatch<React.SetStateAction<string[]>>;
   setHighlightedSetorIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -56,6 +65,9 @@ export interface SetorAutocompleteSetters {
 
 export interface GestorAutocompleteSetters {
   setFormData: React.Dispatch<React.SetStateAction<FormState>>;
+  showGestorAutocomplete: boolean;
+  filteredGestorNames: string[];
+  highlightedGestorIndex: number;
   setShowGestorAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
   setFilteredGestorNames: React.Dispatch<React.SetStateAction<string[]>>;
   setHighlightedGestorIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -63,6 +75,9 @@ export interface GestorAutocompleteSetters {
 
 export interface CoordenadorAutocompleteSetters {
   setFormData: React.Dispatch<React.SetStateAction<FormState>>;
+  showCoordenadorAutocomplete: boolean;
+  filteredCoordenadorNames: string[];
+  highlightedCoordenadorIndex: number;
   setShowCoordenadorAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
   setFilteredCoordenadorNames: React.Dispatch<React.SetStateAction<string[]>>;
   setHighlightedCoordenadorIndex: React.Dispatch<React.SetStateAction<number>>;

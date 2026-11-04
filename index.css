@@ -26,6 +26,10 @@
     background-color: #fff !important;
 }
 
+.force-print-capture .no-print {
+    display: none !important;
+}
+
 .force-print-capture #export-area {
     box-shadow: none !important; /* Remove sombras grandes que podem aparecer cortadas na imagem */
 }

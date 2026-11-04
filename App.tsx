@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import BodyDiagram from "./components/BodyDiagram";
 import FrasleLogo from "./components/FrasleLogo";
 import { Modal } from "./components/ui/Modal";
@@ -145,6 +145,10 @@ const App: React.FC = () => {
   // Estado para controlar se os campos estão preenchidos automaticamente
   const [isAutoFilled, setIsAutoFilled] = useState(false);
   const [images, setImages] = useState<File[]>([]);
+  const [imageToDelete, setImageToDelete] = useState<number | null>(null);
+  const [imageOrientations, setImageOrientations] = useState<
+    Map<File, "portrait" | "landscape">
+  >(() => new Map());
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
   const [notification, setNotification] = useState<{
@@ -167,6 +171,16 @@ const App: React.FC = () => {
   const [gestorLabel, setGestorLabel] = useState("Gestor");
   const [coordenadorLabel, setCoordenadorLabel] = useState("Coordenador");
 
+  const imagePreviewUrls = useMemo(
+    () => images.map((image) => URL.createObjectURL(image)),
+    [images],
+  );
+
+  useEffect(
+    () => () => imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url)),
+    [imagePreviewUrls],
+  );
+
   // Criar handlers
   const {
     handleResponsavelSSMAChange,
@@ -175,6 +189,9 @@ const App: React.FC = () => {
     handleBlur,
   } = createResponsavelSSMAHandlers({
     setFormData,
+    showAutocomplete,
+    filteredNames,
+    highlightedIndex,
     setShowAutocomplete,
     setFilteredNames,
     setHighlightedIndex,
@@ -187,6 +204,9 @@ const App: React.FC = () => {
     handleLocalBlur,
   } = createLocalHandlers({
     setFormData,
+    showLocalAutocomplete,
+    filteredLocalNames,
+    highlightedLocalIndex,
     setShowLocalAutocomplete,
     setFilteredLocalNames,
     setHighlightedLocalIndex,
@@ -199,6 +219,9 @@ const App: React.FC = () => {
     handleSetorBlur,
   } = createSetorHandlers({
     setFormData,
+    showSetorAutocomplete,
+    filteredSetorNames,
+    highlightedSetorIndex,
     setShowSetorAutocomplete,
     setFilteredSetorNames,
     setHighlightedSetorIndex,
@@ -211,6 +234,9 @@ const App: React.FC = () => {
     handleGestorBlur,
   } = createGestorHandlers({
     setFormData,
+    showGestorAutocomplete,
+    filteredGestorNames,
+    highlightedGestorIndex,
     setShowGestorAutocomplete,
     setFilteredGestorNames,
     setHighlightedGestorIndex,
@@ -223,6 +249,9 @@ const App: React.FC = () => {
     handleCoordenadorBlur,
   } = createCoordenadorHandlers({
     setFormData,
+    showCoordenadorAutocomplete,
+    filteredCoordenadorNames,
+    highlightedCoordenadorIndex,
     setShowCoordenadorAutocomplete,
     setFilteredCoordenadorNames,
     setHighlightedCoordenadorIndex,
@@ -281,6 +310,47 @@ const App: React.FC = () => {
         message={modal.message}
         type={modal.type}
       />
+
+      {imageToDelete !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-image-title"
+        >
+          <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h2
+              id="delete-image-title"
+              className="mb-4 text-xl font-bold text-gray-800"
+            >
+              Excluir imagem?
+            </h2>
+            <p className="mb-6 text-gray-700">
+              Tem certeza de que deseja excluir esta imagem?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setImageToDelete(null)}
+                className="rounded bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  removeImage(imageToDelete);
+                  setImageToDelete(null);
+                }}
+                className="rounded bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
+                autoFocus
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Buttons */}
       <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
@@ -867,25 +937,46 @@ const App: React.FC = () => {
                 </div>
               ) : (
                 <div
-                  className={`w-full h-full overflow-y-auto ${images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-2"}`}
+                  className="grid w-full h-full grid-cols-6 gap-3 overflow-y-auto"
                 >
                   {images.slice(0, 4).map((image, index) => (
                     <div
                       key={index}
-                      className="relative group"
-                      style={{ maxWidth: "100%", maxHeight: "400px" }}
+                      className="relative group flex justify-center"
+                      style={{
+                        gridColumn:
+                          imageOrientations.get(image) === "portrait"
+                            ? "span 2 / span 2"
+                            : "span 3 / span 3",
+                      }}
                     >
                       <img
-                        src={URL.createObjectURL(image)}
+                        src={imagePreviewUrls[index]}
                         alt={`Imagem ${index + 1}`}
-                        className="w-full h-full object-contain"
-                        style={{ maxWidth: "100%", maxHeight: "400px" }}
+                        className="block w-full object-contain"
+                        style={{ maxHeight: "400px" }}
+                        onLoad={(event) => {
+                          const orientation =
+                            event.currentTarget.naturalHeight >
+                            event.currentTarget.naturalWidth
+                              ? "portrait"
+                              : "landscape";
+                          setImageOrientations((previous) => {
+                            if (previous.get(image) === orientation) {
+                              return previous;
+                            }
+                            const next = new Map(previous);
+                            next.set(image, orientation);
+                            return next;
+                          });
+                        }}
                       />
                       <button
                         type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setImageToDelete(index)}
+                        className="no-print absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Remover imagem"
+                        aria-label={`Remover imagem ${index + 1}`}
                       >
                         <svg
                           width="12"
@@ -961,7 +1052,7 @@ const App: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeAcaoImediata(index)}
-                      className="absolute top-1 -right-8 text-gray-700 hover:text-gray-900"
+                      className="no-print absolute top-1/2 -right-8 -translate-y-1/2 text-gray-700 hover:text-gray-900"
                       title="Remover ação"
                     >
                       <svg
@@ -1094,7 +1185,7 @@ const App: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeAcaoNecessaria(index)}
-                      className="absolute top-1 -right-8 text-gray-700 hover:text-gray-900"
+                      className="no-print absolute top-1 -right-8 text-gray-700 hover:text-gray-900"
                       title="Remover ação"
                     >
                       <svg
