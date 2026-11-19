@@ -5,7 +5,7 @@ Um sistema web moderno e offline-first desenvolvido para o registro de ocorrênc
 ## 🌟 Funcionalidades
 
 - **Diagrama Corporal Dinâmico:** Interface interativa para marcação do local exato da lesão corporal clicando diretamente sobre o manequim.
-- **Importação Segura de Excel (Offline-First):** Abasteça o banco de dados do sistema localmente pelo navegador importando a planilha `LISTA_PESSOAS.xlsx`, sem necessidade de enviar dados sensíveis dos funcionários para servidores na nuvem.
+- **Dados de funcionários locais:** A lista de funcionários é gerada a partir de `public/LISTA_PESSOAS.xlsx`. O processo inclui no site somente Matrícula, Nome, Cargo, Setor, Líder e Turno; o arquivo original não é incluído no build de produção.
 - **Inferência Inteligente de Hierarquia:** Ao informar o Líder de um funcionário na planilha, o motor algorítmico do sistema calcula automaticamente toda a árvore hierárquica superior (Coordenador, Gestor) e limpa anomalias e prefixos numéricos.
 - **Auto-Completar Turbinado:** O formulário busca instantaneamente no banco de dados local (`IndexedDB`) garantindo zero *delay* na experiência do usuário ao buscar matrículas ou responsáveis.
 
@@ -30,9 +30,12 @@ Um sistema web moderno e offline-first desenvolvido para o registro de ocorrênc
    ```bash
    npm install
    ```
-3. Inicie o servidor de desenvolvimento:
+3. Coloque a planilha atualizada em `public/LISTA_PESSOAS.xlsx` e inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
    ```
+   A planilha deve ter as colunas `Matrícula`, `Nome`, `Cargo`, `Setor (Descrição)`, `Líder` e `Turno` na mesma linha de cabeçalho. O cabeçalho pode estar nas primeiras 50 linhas da primeira aba.
 
-*Nota de Segurança: O arquivo LISTA_PESSOAS.xlsx que abastece a base de dados em produção foi intencionalmente bloqueado de subir para este repositório via `.gitignore` para proteção de dados.*
+Para publicar o site, execute `npm run build` e publique o conteúdo de `dist`. O build gera os dados filtrados em `funcionarios.json`; quando a planilha mudar, substitua o XLSX e gere/publique um novo build. O arquivo original é ignorado pelo Git e removido do build final. O JSON filtrado ainda contém dados de funcionários, portanto o site deve permanecer em um local com acesso autorizado.
+
+*Nota de Segurança: O arquivo `LISTA_PESSOAS.xlsx` é intencionalmente ignorado pelo Git para proteger os dados de funcionários.*

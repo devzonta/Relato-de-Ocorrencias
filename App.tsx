@@ -14,89 +14,27 @@ import {
 import { createFormHandlers } from "./utils/formHandlers";
 import { initializeData } from "./utils/constants";
 
-const SPREADSHEET_ID = "1bII_VYTJ681-eoMBk1gNw73brXM-vjct";
-const SHEET_NAME = "Página1";
-const STORAGE_KEY = "relato_spreadsheet_id";
-
-const getInitialSpreadsheetId = () => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored && stored.trim() !== "") return stored.trim();
-  return "1bII_VYTJ681-eoMBk1gNw73brXM-vjct";
-};
-
 const App: React.FC = () => {
-  const [spreadsheetId, setSpreadsheetId] = useState(getInitialSpreadsheetId);
-  const [isLoading, setIsLoading] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [showIdInput, setShowIdInput] = useState(false);
-  const [tempId, setTempId] = useState(spreadsheetId);
-
   useEffect(() => {
     const loadData = async () => {
       try {
-        setIsLoading(true);
-        await initializeData({
-          spreadsheetId: spreadsheetId,
-          sheetName: SHEET_NAME,
-        });
-        setDataLoaded(true);
-        setNotification({ message: "Dados carregados com sucesso!", type: "success" });
-        setTimeout(() => setNotification(null), 3000);
+        await initializeData();
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
         setModal({
           isOpen: true,
           title: "Erro ao carregar dados",
-          message: "Não foi possível carregar os dados da planilha. Verifique se o Spreadsheet ID está correto e se a planilha está compartilhada como 'Qualquer pessoa com o link pode visualizar'.",
+          message: error instanceof Error
+            ? error.message
+            : "Não foi possível carregar os dados de public\\LISTA_PESSOAS.xlsx.",
           type: "error",
         });
-      } finally {
-        setIsLoading(false);
       }
     };
 
     loadData();
-  }, [spreadsheetId]);
+  }, []);
 
-  const handleRefreshData = async () => {
-    try {
-      setIsLoading(true);
-      await initializeData({
-        spreadsheetId: spreadsheetId,
-        sheetName: SHEET_NAME,
-      });
-      setNotification({ message: "Dados atualizados com sucesso!", type: "success" });
-      setTimeout(() => setNotification(null), 3000);
-    } catch (error) {
-      console.error('Erro ao atualizar dados:', error);
-      setModal({
-        isOpen: true,
-        title: "Erro ao atualizar dados",
-        message: "Não foi possível atualizar os dados do Google Sheets.",
-        type: "error",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSaveSpreadsheetId = () => {
-    const trimmed = tempId.trim();
-    if (!trimmed) {
-      setModal({
-        isOpen: true,
-        title: "ID Inválido",
-        message: "Por favor, insira um Spreadsheet ID válido.",
-        type: "error",
-      });
-      return;
-    }
-    localStorage.setItem(STORAGE_KEY, trimmed);
-    setSpreadsheetId(trimmed);
-    setShowIdInput(false);
-    setNotification({ message: "ID da planilha atualizado! Recarregando dados...", type: "success" });
-    setTimeout(() => setNotification(null), 3000);
-  };
   const [formData, setFormData] = useState<FormState>({
     responsavelSSMA: "",
     data: "",
@@ -146,9 +84,6 @@ const App: React.FC = () => {
   const [isAutoFilled, setIsAutoFilled] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
-  const [imageOrientations, setImageOrientations] = useState<
-    Map<File, "portrait" | "landscape">
-  >(() => new Map());
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
   const [notification, setNotification] = useState<{
@@ -285,6 +220,14 @@ const App: React.FC = () => {
     setCoordenadorLabel,
   );
 
+  const handleDescricaoChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    handleInputChange(event);
+    event.currentTarget.style.height = "auto";
+    event.currentTarget.style.height = `${event.currentTarget.scrollHeight}px`;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       {/* Notification */}
@@ -353,24 +296,7 @@ const App: React.FC = () => {
       )}
 
       {/* Floating Buttons */}
-      <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
-        <button
-          onClick={handleRefreshData}
-          disabled={isLoading}
-          className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Atualizar dados do Google Sheets"
-        >
-          {isLoading ? (
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
-            </svg>
-          )}
-        </button>
+      <div className="fixed top-4 right-4 z-50">
         <button
           onClick={() => handleCopy(formData, selectedBodyParts, images)}
           className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
@@ -898,9 +824,9 @@ const App: React.FC = () => {
               <textarea
                 name="descricao"
                 value={formData.descricao}
-                onChange={handleInputChange}
-                maxLength={1000}
-                className="flex-1 w-full p-2 resize-none focus:outline-none uppercase"
+                onChange={handleDescricaoChange}
+                rows={4}
+                className="w-full p-2 resize-none overflow-hidden focus:outline-none uppercase"
               />
             </div>
             <div className="w-1/3">
@@ -936,40 +862,17 @@ const App: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div
-                  className="grid w-full h-full grid-cols-6 gap-3 overflow-y-auto"
-                >
+                <div className="grid w-full grid-cols-2 gap-3">
                   {images.slice(0, 4).map((image, index) => (
                     <div
                       key={index}
-                      className="relative group flex justify-center"
-                      style={{
-                        gridColumn:
-                          imageOrientations.get(image) === "portrait"
-                            ? "span 2 / span 2"
-                            : "span 3 / span 3",
-                      }}
+                      className="relative group flex min-w-0 items-center justify-center overflow-hidden"
+                      style={{ aspectRatio: "4 / 3" }}
                     >
                       <img
                         src={imagePreviewUrls[index]}
                         alt={`Imagem ${index + 1}`}
-                        className="block w-full object-contain"
-                        style={{ maxHeight: "400px" }}
-                        onLoad={(event) => {
-                          const orientation =
-                            event.currentTarget.naturalHeight >
-                            event.currentTarget.naturalWidth
-                              ? "portrait"
-                              : "landscape";
-                          setImageOrientations((previous) => {
-                            if (previous.get(image) === orientation) {
-                              return previous;
-                            }
-                            const next = new Map(previous);
-                            next.set(image, orientation);
-                            return next;
-                          });
-                        }}
+                        className="block max-h-full max-w-full object-contain"
                       />
                       <button
                         type="button"

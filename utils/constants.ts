@@ -1,5 +1,5 @@
 import listas from '../SSMA.json';
-import { Funcionario, fetchFuncionariosFromSheet, clearCache, getCachedFuncionarios } from './googleSheets';
+import { Funcionario, fetchFuncionariosFromFile, getCachedFuncionarios } from './employeeData';
 
 export const ssmaNames = listas.ssmaNames;
 
@@ -12,7 +12,7 @@ export const refreshConstants = async (): Promise<Funcionario[]> => {
   try {
     const funcionarios = getCachedFuncionarios();
     if (!funcionarios) {
-      throw new Error('Dados do Google Sheets não carregados.');
+      throw new Error('Dados do arquivo de funcionários não carregados.');
     }
 
     localNames = [...new Set(funcionarios.map(p => p.local).filter(Boolean))] as string[];
@@ -27,9 +27,8 @@ export const refreshConstants = async (): Promise<Funcionario[]> => {
   }
 };
 
-export const initializeData = async (config: { spreadsheetId: string; sheetName?: string }): Promise<Funcionario[]> => {
-  clearCache();
-  const funcionarios = await fetchFuncionariosFromSheet(config);
+export const initializeData = async (): Promise<Funcionario[]> => {
+  const funcionarios = await fetchFuncionariosFromFile();
   await refreshConstants();
   return funcionarios;
 };

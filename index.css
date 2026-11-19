@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Copie todo seu CSS @media print para dentro dessa classe */
 .force-print * {
   -webkit-print-color-adjust: exact !important;

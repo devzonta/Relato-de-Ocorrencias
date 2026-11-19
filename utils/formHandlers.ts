@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormState } from '../types';
-import { getFuncionarioByMatricula } from './googleSheets';
+import { getFuncionarioByMatricula } from './employeeData';
 import * as htmlToImage from 'html-to-image';
 
 export const createFormHandlers = (
