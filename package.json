@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generate-funcionarios.cjs",
+    "generate:employees": "node scripts/generate-funcionarios.cjs",
     "dev": "vite",
-    "prebuild": "node scripts/generate-funcionarios.cjs",
     "build": "vite build",
     "postbuild": "node scripts/remove-source-workbook.cjs",
     "preview": "vite preview"

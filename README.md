@@ -30,12 +30,16 @@ Um sistema web moderno e offline-first desenvolvido para o registro de ocorrênc
    ```bash
    npm install
    ```
-3. Coloque a planilha atualizada em `public/LISTA_PESSOAS.xlsx` e inicie o servidor de desenvolvimento:
+3. Coloque a planilha atualizada em `public/LISTA_PESSOAS.xlsx` e gere o JSON filtrado:
+   ```bash
+   npm run generate:employees
+   ```
+4. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
    ```
    A planilha deve ter as colunas `Matrícula`, `Nome`, `Cargo`, `Setor (Descrição)`, `Líder` e `Turno` na mesma linha de cabeçalho. O cabeçalho pode estar nas primeiras 50 linhas da primeira aba.
 
-Para publicar o site, execute `npm run build` e publique o conteúdo de `dist`. O build gera os dados filtrados em `funcionarios.json`; quando a planilha mudar, substitua o XLSX e gere/publique um novo build. O arquivo original é ignorado pelo Git e removido do build final. O JSON filtrado ainda contém dados de funcionários, portanto o site deve permanecer em um local com acesso autorizado.
+O formulário e o build usam `public/funcionarios.json`; o XLSX é necessário apenas para gerar esse arquivo. Quando a planilha mudar, execute novamente `npm run generate:employees` antes de testar ou compilar. Para publicar, execute `npm run build` e publique o conteúdo de `dist`. O arquivo original é ignorado pelo Git e removido do build final. O JSON filtrado ainda contém dados de funcionários, portanto mantenha-o em um local com acesso autorizado e não o envie ao GitHub.
 
 *Nota de Segurança: O arquivo `LISTA_PESSOAS.xlsx` é intencionalmente ignorado pelo Git para proteger os dados de funcionários.*
